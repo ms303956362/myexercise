@@ -23,6 +23,7 @@ void to_lower(string &s){
     }
 }
 
+inline
 int compare_int(int i1, int* pi2){
     return i1 > *pi2 ? i1 : *pi2;
 }
@@ -86,9 +87,9 @@ int main(int argc, char const *argv[])
     // cout << argc << ": " << s << endl;
 
     // 6.27
-    // int s;
-    // s = sum({1, 2, 3, 4, 5});
-    // cout << s << endl;
+    int s;
+    s = sum({1, 2, 3, 4, 5});
+    cout << s << endl;
 
     return 0;
 }
