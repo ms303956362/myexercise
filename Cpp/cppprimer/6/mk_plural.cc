@@ -44,7 +44,7 @@ int main()
 	cout << make_plural(cnt, "success", "es") << endl;
 
 	cnt = 2;
-	cout << make_plural(cnt, "failure", "s") << endl;
+	cout << make_plural(cnt, "failure") << endl;
 
 	return 0;
 }
