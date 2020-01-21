@@ -40,6 +40,9 @@ using std::vector;
 #include <string>
 using std::string;
 
+#include <fstream>
+using std::ifstream;
+
 // members are public by default
 struct PersonInfo { 
 	string name;
@@ -103,7 +106,8 @@ ostream& process(ostream &os, vector<PersonInfo> people)
 
 int main()
 {
-	process(cout, getData(cin));
+	ifstream ifs("data/sstream");
+	process(cout, getData(ifs));
 
 	return 0;
 }
