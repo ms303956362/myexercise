@@ -30,11 +30,11 @@
 // Version_test.h contains definitions for to_string and stod
 // if the compiler does not yet define these functions,
 // this code will use the definitions we provide
-#include "Version_test.h" 
+// #include "Version_test.h" 
 
 #include <string>
 using std::string;
-#ifdef STRING_NUMERIC_CONVS
+#ifndef STRING_NUMERIC_CONVS
 using std::to_string; using std::stod;
 #endif
 
