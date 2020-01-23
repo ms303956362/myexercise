@@ -158,39 +158,63 @@ int main(int argc, char const *argv[])
     // cout << endl;
 
     // 9.31
-    list<int> il{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    auto iter = il.begin();
-    while (iter != il.end()){
+    // list<int> il{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    // auto it = il.begin();
+    // while (it != il.end()){
+    //     if (*it % 2){
+    //         it = il.insert(it, *it);
+    //         ++it;
+    //         ++it;
+    //     } else {
+    //         it = il.erase(it);
+    //     }
+    // }
+    // cout << "use list: " << endl;
+    // for (auto i : il){
+    //     cout << i << " ";
+    // }
+    // cout << endl;
+
+    // forward_list<int> ifl{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    // auto iter = ifl.begin(), prev = ifl.before_begin();
+    // while (iter != ifl.end()){
+    //     if (*iter % 2){
+    //         iter = ifl.insert_after(iter, *iter);
+    //         prev = iter;
+    //         ++iter;
+    //     } else {
+    //         iter = ifl.erase_after(prev);
+    //     }
+    // }
+    // cout << "use foward_list: " << endl;
+    // for (auto i : ifl){
+    //     cout << i << " ";
+    // }
+    // cout << endl;
+
+    // 9.33
+    // vector<int> iv{1, 2, 3, 4, 5};
+    // auto beg = iv.begin();
+    // while (beg != iv.end()){
+    //     ++beg;
+    //     beg = iv.insert(beg, 42);
+    //     ++beg;
+    // }
+    
+    // 9.34
+    vector<int> iv{1, 2, 3, 4, 5};
+    auto iter = iv.begin();
+    while (iter!=iv.end()){
         if (*iter % 2){
-            iter = il.insert(iter, *iter);
+            iter = iv.insert(iter, *iter);
             ++iter;
-            ++iter;
-        } else {
-            iter = il.erase(iter);
         }
+        ++iter;
     }
-    cout << "use list: " << endl;
-    for (auto i : il){
+    for (auto i : iv)
         cout << i << " ";
-    }
     cout << endl;
 
-        forward_list<int> ifl{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    auto iter = ifl.begin(), prev = ifl.before_begin();
-    while (iter != ifl.end()){
-        if (*iter % 2){
-            iter = ifl.insert_after(iter, *iter);
-            prev = iter;
-            ++iter;
-        } else {
-            iter = ifl.erase_after(prev);
-        }
-    }
-    cout << "use foward_list: " << endl;
-    for (auto i : ifl){
-        cout << i << " ";
-    }
-    cout << endl;
     return 0;
  }
  
