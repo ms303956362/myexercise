@@ -48,14 +48,13 @@ public:
     Date(string s){
         vector<string> mon{"January", "Febuary", "March", "April", "May", "June", "July", "August", "September", "October", "Novemver", "Decmber"};
         vector<string> m{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-        
+
     }
 private:
     unsigned year;
     unsigned month;
     unsigned day;
-}
-
+};
 
 int main(int argc, char const *argv[])
 {
