@@ -1,13 +1,19 @@
 #include <iostream>
+using std::cerr;
 using std::cin;
 using std::cout;
 using std::endl;
 
 #include <string>
+using std::invalid_argument;
+using std::out_of_range;
 using std::string;
 
 #include <vector>
 using std::vector;
+
+#include <sstream>
+using std::stringstream;
 
 string& find_and_replace(string& s, const string& oldVal, const string& newVal){
     for (auto iter = s.begin(); std::distance(iter, s.end()) >= std::distance(oldVal.begin(), oldVal.end()); ++iter){
@@ -45,16 +51,70 @@ string& add_pre_post2(string& s, const string& pre, const string& post){
 
 class Date{
 public:
-    Date(string s){
-        vector<string> mon{"January", "Febuary", "March", "April", "May", "June", "July", "August", "September", "October", "Novemver", "Decmber"};
-        vector<string> m{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
-    }
+    Date(const string& s);
 private:
     unsigned year;
     unsigned month;
     unsigned day;
 };
+
+int find_month(vector<string> mon, string s){
+    for (decltype(mon.size()) i = 0; i != mon.size(); ++i){
+        if (mon[i] == s){
+            return i + 1;
+        }
+    }
+    return 0;
+}
+
+Date::Date(const string& s){
+    vector<string> mon{"January", "Febuary", "March", "April", "May", "June", "July", "August", "September", "October", "Novemver", "Decmber"};
+    vector<string> m{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    stringstream ss(s);
+    string s_curr;
+    int mon_find;
+    ss >> s_curr;
+    if ((mon_find = find_month(mon, s_curr)) != 0)
+    {
+        month = mon_find;
+        ss >> s_curr;
+        s_curr.pop_back();
+        day = std::stoi(s_curr);
+        ss >> s_curr;
+        year = std::stoi(s_curr);
+    }
+    else if ((mon_find = find_month(m, s_curr)) != 0)
+    {
+        month = mon_find;
+        ss >> s_curr;
+        day = std::stoi(s_curr);
+        ss >> s_curr;
+        year = std::stoi(s_curr);
+    } else {
+        decltype(s_curr.begin()) first, second;
+        bool is_first = true;
+        for (auto iter = s_curr.begin(); iter != s_curr.end(); ++iter){
+            if (*iter == '/'){
+                if (is_first){
+                    is_first = false;
+                    first = iter;
+                } else {
+                    second = iter;
+                    break;
+                }
+            }
+        }
+        try{
+            month = std::stoi(string(s_curr.begin(), first));
+            day = std::stoi(string(first + 1, second));
+            year = std::stoi(string(second + 1, s_curr.end()));
+        } catch(invalid_argument&) { 
+            cerr << "invaild format" << endl;
+        } catch(out_of_range&) {
+            cerr << "invaild number" << endl;
+        }
+    }
+}
 
 int main(int argc, char const *argv[])
 {
@@ -126,7 +186,9 @@ int main(int argc, char const *argv[])
     // cout << fsum << endl;
 
     // 9.51
-
+    Date d1("January 1, 1990");
+    Date d2("1/1/1990");
+    Date d3("Jan 1 1990");
 
 
     return 0;
