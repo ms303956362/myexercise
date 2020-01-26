@@ -25,6 +25,10 @@ using std::stringstream;
 
 #include "my_Sales_data.h"
 
+#include <functional>
+using std::bind;
+using namespace std::placeholders;
+
 void elimDups(vector<string> &words){
     sort(words.begin(), words.end());
     auto end_unique = unique(words.begin(), words.end());
@@ -58,6 +62,21 @@ void biggies(vector<string> &words, vector<string>::size_type sz){
 void biggies2(vector<string> &words, vector<string>::size_type sz){
     elimDups(words);
     auto wc = stable_partition(words.begin(), words.end(), [sz](const string &word) { return word.size() <= sz; });
+    auto count = words.end() - wc;
+    cout << count << " words are longer than " << sz << ": ";
+    for (auto iter = wc; iter != words.end(); ++iter){
+        cout << *iter << " ";
+    }
+    cout << endl;
+}
+
+bool check_size(string& s, string::size_type sz){
+    return s.size() <= sz;
+}
+
+void biggies3(vector<string> &words, vector<string>::size_type sz){
+    elimDups(words);
+    auto wc = stable_partition(words.begin(), words.end(), bind(check_size, _1, sz));
     auto count = words.end() - wc;
     cout << count << " words are longer than " << sz << ": ";
     for (auto iter = wc; iter != words.end(); ++iter){
@@ -146,17 +165,33 @@ int main(int argc, char const *argv[])
     // cout << cnt << endl;
 
     // 10.21
-    int i = 6;
-    auto f = [&i]() -> bool {
-        if (i > 0)
-            --i;
-        return i == 0;
-    };
-    for (int j = 0; j != 7;++j){
-        bool flag = f();
-        cout << i << " is 0: ";
-        cout << (flag ? "true" : "false") << endl;
-    }
+    // int i = 6;
+    // auto f = [&i]() -> bool {
+    //     if (i > 0)
+    //         --i;
+    //     return i == 0;
+    // };
+    // for (int j = 0; j != 7;++j){
+    //     bool flag = f();
+    //     cout << i << " is 0: ";
+    //     cout << (flag ? "true" : "false") << endl;
+    // }
+
+    // 10.22
+    // vector<string> words{"the", "quick", "red", "fox", "jumps", "over", "the", "red", "turtles"};
+    // string::size_type sz=5;
+    // auto cnt = count_if(words.begin(), words.end(), bind(check_size, _1, sz));
+    // cout << cnt << endl;
+
+    // 10.24
+    // string s="abcde";
+    // vector<int> iv{1, 2, 5, 3, 4, 5, 6};
+    // auto iter = find_if(iv.begin(), iv.end(), bind(check_size, s, _1));
+    // cout << *iter << endl;
+
+    // 10.25
+    vector<string> words{"the", "quick", "red", "fox", "jumps", "over", "the", "red", "turtles"};
+    biggies3(words, 5);
 
     return 0;
 }
