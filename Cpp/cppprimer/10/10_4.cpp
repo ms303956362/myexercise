@@ -15,6 +15,8 @@ using std::ofstream;
 #include <algorithm>
 using std::copy;
 using std::find;
+using std::replace_copy;
+using std::replace_copy_if;
 using std::sort;
 using std::unique_copy;
 
@@ -145,10 +147,27 @@ int main(int argc, char const *argv[])
     // cout << *++iter << " "<< *--iter << " " << *--iter << endl;
 
     // 10.37
-    vector<int> iv{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    list<int> il;
-    copy(iv.rend() - 7, iv.rend() - 2, back_inserter(il));
-    print_seq(il.begin(), il.end());
+    // vector<int> iv{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    // list<int> il;
+    // copy(iv.rend() - 7, iv.rend() - 2, back_inserter(il));
+    // print_seq(il.begin(), il.end());
+
+    // 10.41
+    // vector<int> iv{1, 2, 3, 4, 5};
+    // list<int> il, il2;
+    // ostream_iterator<int> out_iter(cout, " ");
+    // replace_copy(iv.begin(), iv.end(), back_inserter(il), 3, 6);
+    // replace_copy_if(iv.begin(), iv.end(), back_inserter(il2), [](int i) { return i == 5; }, 10);
+    // copy(il.begin(), il.end(), out_iter);
+    // cout << endl;
+    // copy(il2.begin(), il2.end(), out_iter);
+
+    // 10.42
+    list<string> words{"the", "quick", "red", "fox", "jumps", "over", "the", "red", "turtles"};
+    words.sort();
+    words.unique();
+    ostream_iterator<string> iter(cout, " ");
+    copy(words.begin(), words.end(), iter);
 
     return 0;
 }
