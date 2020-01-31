@@ -118,10 +118,49 @@ int main(int argc, char const *argv[])
     // unique_ptr<int> sp2 = sp;
 
     // 12.17
-    int ix = 1024, *pi = &ix, *pi2 = new int(2048);
-    typedef unique_ptr<int> IntP;
-    IntP p2(pi2);
-    IntP p5(p2.get());
+    // int ix = 1024, *pi = &ix, *pi2 = new int(2048);
+    // typedef unique_ptr<int> IntP;
+    // IntP p2(pi2);
+    // IntP p5(p2.get());
+
+    // 12.20
+    // vector<int> iv{1, 2, 3};
+    // for (auto iter = iv.begin(); iter != iv.end();++iter){
+    //     cout << *iter << " ";
+    // }
+    // cout << endl;
+
+    // MyStrBlob msb{1, 2}, msb1 = msb;
+    // msb.push_back(3);
+    // msb1.push_back(4);
+    // msb.push_back(5);
+    // msb.push_back(6);
+    // msb1.pop_back();
+    // for (auto iter = msb.begin(); !equal(iter, msb.end()); iter.incr())
+    // {
+    //     cout << iter.deref() << " ";
+    // }
+    // cout << endl;
+
+    // 12.22
+    const vector<int> civ{1, 2, 3};
+    for (auto citer = civ.begin(); citer != civ.end();++citer)
+    {
+        cout << *citer << " ";
+    }
+    cout << endl;
+
+    const MyStrBlob cmsb{1, 2, 3, 4, 5, 6};
+    for (auto citer = cmsb.begin(); !equal(citer, cmsb.end());citer.incr()){
+        cout << citer.deref() << " ";
+    }
+    cout << endl;
+
+    MyStrBlob msb{1, 2, 3, 4, 5};
+    for (auto iter = msb.cbegin(); !equal(iter, msb.cend());iter.incr()){
+        cout << iter.deref() << " ";
+    }
+    cout << endl;
 
     return 0;
 }
