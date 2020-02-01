@@ -1,3 +1,5 @@
+#ifndef _MY_STRBLOB
+#define _MY_STRBLOB
 #include <iostream>
 #include <memory>
 #include <initializer_list>
@@ -13,13 +15,15 @@ class MyStrBlob{
     friend class ConstMyStrBlobPtr;
 
 public:
-    using T = int;
+    using T = std::string;
     MyStrBlob() : data(std::make_shared<std::vector<T>>()){};
     MyStrBlob(std::initializer_list<T> il) : data(std::make_shared<std::vector<T>>(il)){};
     size_t size() const { return data->size(); }
     bool empty() const { return data->empty(); }
     void push_back(const T &e) { data->push_back(e); }
     void pop_back() { data->pop_back(); }
+    T &at(std::vector<T>::size_type index) { return data->at(index); }
+    const T &at(std::vector<T>::size_type index) const { return data->at(index); }
     T &front() { return data->front(); }
     T &back() { return data->back(); }
     const T &front() const { return data->front(); }
@@ -45,7 +49,7 @@ class MyStrBlobPtr{
     friend bool equal(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2);
 
 public:
-    using T = int;
+    using T = std::string;
     MyStrBlobPtr() : curr(0){};
     MyStrBlobPtr(MyStrBlob& msb, size_t sz = 0) : wp(msb.data), curr(sz){};
     MyStrBlobPtr &incr();
@@ -96,7 +100,7 @@ class ConstMyStrBlobPtr{
     friend bool equal(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2);
 
 public:
-    using T = int;
+    using T = std::string;
     ConstMyStrBlobPtr() : curr(0){};
     ConstMyStrBlobPtr(const MyStrBlob& msb, size_t sz = 0) : wp(msb.data), curr(sz){};
     ConstMyStrBlobPtr &incr();
@@ -150,3 +154,4 @@ ConstMyStrBlobPtr MyStrBlob::begin() const{
 ConstMyStrBlobPtr MyStrBlob::end() const{
     return ConstMyStrBlobPtr(*this, data->size());
 }
+#endif
