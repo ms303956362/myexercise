@@ -94,6 +94,8 @@ private:
 
 #include <algorithm>
 
+std::allocator<std::string> StrVec::alloc;
+
 inline
 StrVec::~StrVec() noexcept { free(); }
 

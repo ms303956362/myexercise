@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <exception>
+#include <utility>
 
 class MyStrBlobPtr;
 class ConstMyStrBlobPtr;
@@ -23,6 +24,7 @@ public:
     size_t size() const { return data->size(); }
     bool empty() const { return data->empty(); }
     void push_back(const T &e) { data->push_back(e); }
+    void push_back(T &&e) { data->push_back(std::move(e)); }
     void pop_back() { data->pop_back(); }
     T &at(std::vector<T>::size_type index) { return data->at(index); }
     const T &at(std::vector<T>::size_type index) const { return data->at(index); }

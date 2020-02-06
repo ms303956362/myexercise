@@ -9,8 +9,8 @@
 #include <set>
 #include <memory>
 #include <algorithm>
-#include "my_StrBlob.h"
-// using MyStrBlob = std::vector<std::string>;
+#include "my_StrVec.h"
+using MyStrBlob = My_StrVec;
 
 class MyQueryResult;
 

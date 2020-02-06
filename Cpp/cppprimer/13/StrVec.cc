@@ -39,6 +39,6 @@ using std::allocator;
 // StrVec's allocator should be a static member not an ordinary member
 
 // definition for static data member
-allocator<string> StrVec::alloc;  
+// allocator<string> StrVec::alloc;  
 
 // all other StrVec members are inline and defined inside StrVec.h
