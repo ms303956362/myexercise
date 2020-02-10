@@ -18,6 +18,7 @@ class my_String {
     friend ostream &operator<<(ostream &os, my_String &mstr);
     friend bool operator==(const my_String &lms, const my_String &rms);
     friend bool operator!=(const my_String &lms, const my_String &rms);
+    friend bool operator<(const my_String &lms, const my_String &rms);
 
 private:
     static allocator<char> alloc;
@@ -35,6 +36,8 @@ public:
     ~my_String();
     my_String& operator=(const my_String &rs);
     my_String& operator=(my_String &&rs) noexcept;
+    char &operator[](size_t n) { return elements[n]; }
+    const char &operator[](size_t n) const { return elements[n]; }
     size_t capacity() const { return cap - elements; }
     size_t size() const { return first_free - elements; }
     char *begin() { return elements; }
@@ -126,4 +129,8 @@ bool operator==(const my_String &lms, const my_String &rms){
 
 bool operator!=(const my_String &lms, const my_String &rms){
     return strcmp(lms.elements, rms.elements);
+}
+
+bool operator<(const my_String &lms, const my_String &rms){
+    return strcmp(lms.elements, rms.elements) < 0;
 }

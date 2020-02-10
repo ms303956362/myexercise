@@ -18,6 +18,7 @@ class My_StrVec
 {
     friend bool operator==(const My_StrVec &lmsv, const My_StrVec &rmsv);
     friend bool operator!=(const My_StrVec &lmsv, const My_StrVec &rmsv);
+    friend bool operator<(const My_StrVec &lmsv, const My_StrVec &rmsv);
 
 private:
     using T = string;
@@ -38,6 +39,9 @@ public:
     ~My_StrVec();
     My_StrVec& operator=(const My_StrVec &rmsv);
     My_StrVec& operator=(My_StrVec &&rmsv) noexcept;
+    My_StrVec &operator=(initializer_list<T> &il);
+    T &operator[](size_t n) { return elements[n]; }
+    const T &operator[](size_t n) const { return elements[n]; }
     T &at(size_t i) const { return *(elements + i); }
     void push_back(const T &elem);
     size_t capacity() const { return cap - elements; }
@@ -120,6 +124,14 @@ My_StrVec& My_StrVec::operator=(My_StrVec &&rmsv) noexcept {
     return *this;
 }
 
+My_StrVec &My_StrVec::operator=(initializer_list<T> &il){
+    auto data = alloc_n_copy(il.begin(), il.end());
+    free();
+    elements = data.first;
+    first_free = cap = data.second;
+    return *this;
+}
+
 void My_StrVec::push_back(const My_StrVec::T& elem){
     chk_n_alloc();
     alloc.construct(first_free++, elem);
@@ -166,4 +178,16 @@ bool operator==(const My_StrVec &lmsv, const My_StrVec &rmsv){
 
 bool operator!=(const My_StrVec &lmsv, const My_StrVec &rmsv){
     return !(lmsv == rmsv);
+}
+
+bool operator<(const My_StrVec &lmsv, const My_StrVec &rmsv){
+    auto liter = lmsv.elements;
+    auto riter = rmsv.elements;
+    while (liter != lmsv.first_free && riter != rmsv.first_free){
+        if (*liter != *riter)
+            return *liter < *riter;
+        ++liter;
+        ++riter;
+    }
+    return (lmsv.first_free - liter) < (rmsv.first_free - riter);
 }

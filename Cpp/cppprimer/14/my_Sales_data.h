@@ -17,6 +17,7 @@ public:
         read(is, *this);
     }
     Sales_data &operator+=(Sales_data &item);
+    Sales_data &operator=(const std::string &s);
     std::string &isbn() { return bookNo; }
     Sales_data &combine(const Sales_data &item);
 
@@ -53,6 +54,29 @@ Sales_data &Sales_data::operator+=(Sales_data &item){
     }
     return *this;
 }
+
+Sales_data &Sales_data::operator=(const std::string &s){
+    bookNo = s;
+    units_sold = 0;
+    revenue = 0;
+    return *this;
+}
+
+// Sales_data operator+(Sales_data &item1, Sales_data &item2){
+//     Sales_data sum = item1;
+//     if (sum.bookNo == item2.bookNo){
+//         sum.units_sold += item2.units_sold;
+//         sum.revenue += item2.revenue;
+//     } else {
+//         std::cerr << "bookNos are not same" << std::endl;
+//     }
+//     return sum;
+// }
+
+// Sales_data &Sales_data::operator+=(Sales_data &item){
+//     *this = *this + item;
+//     return *this;
+// }
 
 Sales_data& Sales_data::combine(const Sales_data &item){
     units_sold += item.units_sold;

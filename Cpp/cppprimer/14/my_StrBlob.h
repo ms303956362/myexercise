@@ -16,6 +16,7 @@ class MyStrBlob{
     friend class ConstMyStrBlobPtr;
     friend bool operator==(const MyStrBlob &lmsb, const MyStrBlob &rmsb);
     friend bool operator!=(const MyStrBlob &lmsb, const MyStrBlob &rmsb);
+    friend bool operator<(const MyStrBlob &lmsb, const MyStrBlob &rmsb);
 
 public:
     using T = std::string;
@@ -23,6 +24,8 @@ public:
     MyStrBlob(std::initializer_list<T> il) : data(std::make_shared<std::vector<T>>(il)){};
     MyStrBlob(const MyStrBlob &rmsb) : data(std::make_shared<std::vector<T>>(*rmsb.data)){};
     MyStrBlob &operator=(const MyStrBlob &rmsb) { data = std::make_shared<std::vector<T>>(*rmsb.data); return *this; }
+    std::string &operator[](size_t n) { return (*data)[n]; }
+    const std::string &operator[](size_t n) const { return (*data)[n]; }
     size_t size() const { return data->size(); }
     bool empty() const { return data->empty(); }
     void push_back(const T &e) { data->push_back(e); }
@@ -59,9 +62,14 @@ bool operator!=(const MyStrBlob &lmsb, const MyStrBlob &rmsb){
     return !(lmsb == rmsb);
 }
 
+bool operator<(const MyStrBlob &lmsb, const MyStrBlob &rmsb){
+    return *lmsb.data < *rmsb.data;
+}
+
 class MyStrBlobPtr{
     friend bool operator==(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2);
     friend bool operator!=(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2);
+    friend bool operator<(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2);
 
 public:
     using T = std::string;
@@ -107,6 +115,13 @@ bool operator!=(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2){
     return !(p1 == p2);
 }
 
+bool operator<(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2){
+    if (p1.wp.lock() != p2.wp.lock())
+        throw std::runtime_error("not pointed to same vector");
+    else
+        return p1.curr < p2.curr;
+}
+
 MyStrBlobPtr MyStrBlob::begin(){
     return MyStrBlobPtr(*this); 
 }
@@ -118,6 +133,7 @@ MyStrBlobPtr MyStrBlob::end(){
 class ConstMyStrBlobPtr{
     friend bool operator==(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2);
     friend bool operator!=(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2);
+    friend bool operator<(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2);
 
 public:
     using T = std::string;
@@ -161,6 +177,13 @@ bool operator==(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2){
 
 bool operator!=(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2){
     return !(p1 == p2);
+}
+
+bool operator<(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2){
+    if (p1.wp.lock() != p2.wp.lock())
+        throw std::runtime_error("not pointed to same vector");
+    else
+        return p1.curr < p2.curr;
 }
 
 ConstMyStrBlobPtr MyStrBlob::cbegin() const{
