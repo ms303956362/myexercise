@@ -70,13 +70,22 @@ class MyStrBlobPtr{
     friend bool operator==(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2);
     friend bool operator!=(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2);
     friend bool operator<(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2);
+    friend MyStrBlobPtr operator+(const MyStrBlobPtr &p1, size_t n);
+    friend MyStrBlobPtr operator-(const MyStrBlobPtr &p1, size_t n);
+    friend long long operator-(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2);
 
 public:
     using T = std::string;
     MyStrBlobPtr() : curr(0){};
     MyStrBlobPtr(MyStrBlob& msb, size_t sz = 0) : wp(msb.data), curr(sz){};
-    MyStrBlobPtr &incr();
-    T &deref() const;
+    MyStrBlobPtr &operator++();
+    MyStrBlobPtr operator++(int);
+    MyStrBlobPtr &operator--();
+    MyStrBlobPtr operator--(int);
+    MyStrBlobPtr& operator+=(size_t n);
+    MyStrBlobPtr& operator-=(size_t n);
+    T &operator*() const;
+    T *operator->() const;
 
 private:
     std::weak_ptr<std::vector<T>> wp;
@@ -91,17 +100,6 @@ std::shared_ptr<std::vector<MyStrBlobPtr::T>> MyStrBlobPtr::check(size_t idx, co
     if (idx >= ret->size())
         throw std::out_of_range(msg);
     return ret;
-}
-
-MyStrBlobPtr& MyStrBlobPtr::incr(){
-    check(curr, "increased index is beyond the size of vector");
-    ++curr;
-    return *this;
-}
-
-MyStrBlobPtr::T& MyStrBlobPtr::deref() const{
-    auto p = check(curr, "can't dereference a invaild ptr");
-    return p->at(curr);
 }
 
 bool operator==(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2){
@@ -122,6 +120,70 @@ bool operator<(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2){
         return p1.curr < p2.curr;
 }
 
+MyStrBlobPtr &MyStrBlobPtr::operator++(){
+    check(curr, "increased index is beyond the size of vector");
+    ++curr;
+    return *this;
+}
+
+MyStrBlobPtr MyStrBlobPtr::operator++(int){
+    auto ret = *this;
+    ++*this;
+    return ret;
+}
+
+MyStrBlobPtr &MyStrBlobPtr::operator--(){
+    --curr;
+    check(curr, "decreament past beyond the begining index");
+    return *this;
+}
+
+MyStrBlobPtr MyStrBlobPtr::operator--(int){
+    auto ret = *this;
+    --*this;
+    return ret;
+}
+
+MyStrBlobPtr& MyStrBlobPtr::operator+=(size_t n){
+    check(curr + n, "increased index is beyond the size of vector");
+    curr += n;
+    return *this;
+}
+
+MyStrBlobPtr& MyStrBlobPtr::operator-=(size_t n){
+    check(curr - n, "decreament past beyond the begining index");
+    curr -= n;
+    return *this;
+}
+
+MyStrBlobPtr operator+(const MyStrBlobPtr &p1, size_t n){
+    MyStrBlobPtr p2 = p1;
+    p2 += n;
+    return p2;
+}
+
+MyStrBlobPtr operator-(const MyStrBlobPtr &p1, size_t n){
+    MyStrBlobPtr p2 = p1;
+    p2 -= n;
+    return p2;
+}
+
+long long operator-(const MyStrBlobPtr &p1, const MyStrBlobPtr &p2){
+    if (p1.curr > p2.curr)
+        return p1.curr - p2.curr;
+    else
+        return -(p2.curr - p1.curr);
+}
+
+MyStrBlobPtr::T &MyStrBlobPtr::operator*() const{
+    auto p = check(curr, "can't dereference a invaild ptr");
+    return (*p)[curr];
+}
+
+MyStrBlobPtr::T *MyStrBlobPtr::operator->() const{
+    return &(this->operator*());
+}
+
 MyStrBlobPtr MyStrBlob::begin(){
     return MyStrBlobPtr(*this); 
 }
@@ -134,13 +196,22 @@ class ConstMyStrBlobPtr{
     friend bool operator==(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2);
     friend bool operator!=(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2);
     friend bool operator<(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2);
+    friend ConstMyStrBlobPtr operator+(const ConstMyStrBlobPtr &p1, size_t n);
+    friend ConstMyStrBlobPtr operator-(const ConstMyStrBlobPtr &p1, size_t n);
+    friend long long operator-(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2);
 
 public:
     using T = std::string;
     ConstMyStrBlobPtr() : curr(0){};
     ConstMyStrBlobPtr(const MyStrBlob& msb, size_t sz = 0) : wp(msb.data), curr(sz){};
-    ConstMyStrBlobPtr &incr();
-    const T &deref() const;
+    ConstMyStrBlobPtr &operator++();
+    ConstMyStrBlobPtr operator++(int);
+    ConstMyStrBlobPtr &operator--();
+    ConstMyStrBlobPtr operator--(int);
+    ConstMyStrBlobPtr& operator+=(size_t n);
+    ConstMyStrBlobPtr& operator-=(size_t n);
+    const T &operator*() const;
+    const T *operator->() const;
 
 private:
     std::weak_ptr<std::vector<T>> wp;
@@ -155,17 +226,6 @@ std::shared_ptr<std::vector<MyStrBlobPtr::T>> ConstMyStrBlobPtr::check(size_t id
     if (idx >= ret->size())
         throw std::out_of_range(msg);
     return ret;
-}
-
-ConstMyStrBlobPtr& ConstMyStrBlobPtr::incr(){
-    check(curr, "increased index is beyond the size of vector");
-    ++curr;
-    return *this;
-}
-
-const ConstMyStrBlobPtr::T& ConstMyStrBlobPtr::deref() const{
-    auto p = check(curr, "can't dereference a invaild ptr");
-    return p->at(curr);
 }
 
 bool operator==(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2){
@@ -184,6 +244,70 @@ bool operator<(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2){
         throw std::runtime_error("not pointed to same vector");
     else
         return p1.curr < p2.curr;
+}
+
+ConstMyStrBlobPtr &ConstMyStrBlobPtr::operator++(){
+    check(curr, "increased index is beyond the size of vector");
+    ++curr;
+    return *this;
+}
+
+ConstMyStrBlobPtr ConstMyStrBlobPtr::operator++(int){
+    auto ret = *this;
+    ++*this;
+    return ret;
+}
+
+ConstMyStrBlobPtr &ConstMyStrBlobPtr::operator--(){
+    --curr;
+    check(curr, "decreament past beyond the begining index");
+    return *this;
+}
+
+ConstMyStrBlobPtr ConstMyStrBlobPtr::operator--(int){
+    auto ret = *this;
+    --*this;
+    return ret;
+}
+
+ConstMyStrBlobPtr& ConstMyStrBlobPtr::operator+=(size_t n){
+    check(curr + n, "increased index is beyond the size of vector");
+    curr += n;
+    return *this;
+}
+
+ConstMyStrBlobPtr& ConstMyStrBlobPtr::operator-=(size_t n){
+    check(curr - n, "decreament past beyond the begining index");
+    curr -= n;
+    return *this;
+}
+
+ConstMyStrBlobPtr operator+(const ConstMyStrBlobPtr &p1, size_t n){
+    ConstMyStrBlobPtr p2 = p1;
+    p2 += n;
+    return p2;
+}
+
+ConstMyStrBlobPtr operator-(const ConstMyStrBlobPtr &p1, size_t n){
+    ConstMyStrBlobPtr p2 = p1;
+    p2 -= n;
+    return p2;
+}
+
+long long operator-(const ConstMyStrBlobPtr &p1, const ConstMyStrBlobPtr &p2){
+    if (p1.curr > p2.curr)
+        return p1.curr - p2.curr;
+    else
+        return -(p2.curr - p1.curr);
+}
+
+const ConstMyStrBlobPtr::T &ConstMyStrBlobPtr::operator*() const{
+    auto p = check(curr, "can't dereference a invaild ptr");
+    return (*p)[curr];
+}
+
+const ConstMyStrBlobPtr::T *ConstMyStrBlobPtr::operator->() const{
+    return &(this->operator*());
 }
 
 ConstMyStrBlobPtr MyStrBlob::cbegin() const{

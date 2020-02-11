@@ -15,6 +15,20 @@ using std::for_each;
 #include "my_StrVec.h"
 #include "my_StrBlob.h"
 
+class PtrMyStrBlobPtr{
+private:
+    MyStrBlobPtr *p=nullptr;
+public:
+    PtrMyStrBlobPtr() = default;
+    PtrMyStrBlobPtr(MyStrBlobPtr& pmsb) : p(&pmsb){};
+    MyStrBlobPtr &operator*(){
+        return *p;
+    }
+    MyStrBlobPtr *operator->(){
+        return p;
+    }
+};
+
 int main(int argc, char const *argv[])
 {
     // 14.2
@@ -76,12 +90,65 @@ int main(int argc, char const *argv[])
     // cout << endl;
 
     // 14.26
-    My_StrVec sv{"abc", "def", "ghi"};
-    MyStrBlob sb{"abc", "def", "ghi"};
-    my_String s("caonima");
-    cout << s[3] << endl;
-    cout << sb[1] << endl;
-    cout << sv[0] << endl;
+    // My_StrVec sv{"abc", "def", "ghi"};
+    // MyStrBlob sb{"abc", "def", "ghi"};
+    // my_String s("caonima");
+    // cout << s[3] << endl;
+    // cout << sb[1] << endl;
+    // cout << sv[0] << endl;
+
+    // 14.27
+    // MyStrBlob sb{"abc", "def", "ghi"};
+    // for (auto iter = sb.begin(); iter != sb.end();++iter){
+    //     cout << iter.deref() << " ";
+    // }
+    // cout << endl;
+    // for (auto iter = sb.cend(); iter != sb.cbegin();){
+    //     cout << (--iter).deref() << " ";
+    // }
+    // cout << endl;
+
+    // 14.28
+    // MyStrBlob sb{"abc", "def", "ghi"};
+    // auto p1 = sb.begin(), iter = p1;
+    // auto cp1 = sb.cbegin(), citer = cp1;
+    // cout << iter.deref() << " ";
+    // iter = p1 + 1;
+    // cout << iter.deref() << " ";
+    // iter += 1;
+    // cout << iter.deref() << " ";
+    // p1 = iter - 1;
+    // cout << p1.deref() << " ";
+    // p1 -= 1;
+    // cout << p1.deref() << " ";
+    // cout << iter - p1 << " " << p1 - iter << endl;
+    // cout << citer.deref() << " ";
+    // citer = cp1 + 1;
+    // cout << citer.deref() << " ";
+    // citer += 1;
+    // cout << citer.deref() << " ";
+    // cp1 = citer - 1;
+    // cout << cp1.deref() << " ";
+    // cp1 -= 1;
+    // cout << cp1.deref() << " ";
+    // cout << citer - cp1 << " " << cp1 - citer << endl;
+
+    // 14.30
+    // MyStrBlob sb{"abc", "cdef", "efghi"};
+    // for (auto iter = sb.begin(); iter != sb.end();++iter){
+    //     cout << *iter << " ";
+    // }
+    // cout << endl;
+    // for (auto iter = sb.cend(); iter != sb.cbegin();){
+    //     cout << (--iter)->size() << " ";
+    // }
+    // cout << endl;
+
+    // 14.32
+    MyStrBlob sb{"abc", "cdef", "efghi"};
+    auto pmsb = sb.begin();
+    PtrMyStrBlobPtr ppmsb(pmsb);
+    cout << ppmsb->operator*() << endl;
 
     return 0;
 }
