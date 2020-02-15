@@ -30,7 +30,7 @@
 #ifndef QUOTE_H
 #define QUOTE_H
 
-#include "Version_test.h"
+#include "../Version_test.h"
 
 #include <memory>
 #include <iostream>
