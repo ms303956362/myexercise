@@ -19,6 +19,8 @@ public:
     MyQuote &operator=(MyQuote &&rmq) noexcept;
     virtual ~MyQuote() { std::cout << "~MyQuote()" << std::endl; }
     std::string isbn() const { return bookNo; }
+    virtual MyQuote* clone() const & { return new MyQuote(*this); }
+    virtual MyQuote *clone() const && { return new MyQuote(std::move(*this)); }
     virtual double net_price(std::size_t n) const { return n * price; }
     virtual std::ostream &debug(std::ostream &os) const 
         { os << "bookNo: " << bookNo << " price:" << price; return os; }
@@ -71,6 +73,8 @@ public:
     MyDiscQuote &operator=(const MyDiscQuote &rmdq);
     MyDiscQuote &operator=(MyDiscQuote &&rmdq) noexcept;
     ~MyDiscQuote() override { std::cout << "~MyDiscQuote()" << std::endl; }
+    MyDiscQuote *clone() const & = 0;
+    MyDiscQuote *clone() const && = 0;
     double net_price(std::size_t n) const = 0;
     std::ostream &debug(std::ostream &os) const = 0;
 };
@@ -107,6 +111,8 @@ public:
     MyBulkQuote &operator=(const MyBulkQuote &rmbq);
     MyBulkQuote &operator=(MyBulkQuote &&rmbq) noexcept;
     ~MyBulkQuote() override { std::cout << "~MyBulkQuote()" << std::endl; }
+    MyBulkQuote *clone() const & override { return new MyBulkQuote(*this); }
+    MyBulkQuote *clone() const && override { return new MyBulkQuote(std::move(*this)); }
     double net_price(std::size_t n) const override;
     std::ostream &debug(std::ostream &os) const override;
 };
