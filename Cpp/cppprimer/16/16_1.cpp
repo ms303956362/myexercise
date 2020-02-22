@@ -11,7 +11,10 @@ using std::vector;
 #include <string>
 using std::string;
 
+#include <utility>
+
 #include "Sales_data.h"
+#include "MyBlob.h"
 
 template <typename T>
 int compare(const T& item1, const T& item2) {
@@ -80,16 +83,31 @@ int main(int argc, char const *argv[])
     // print(b);
 
     // 16.6
-    int a[3] = {1, 2, 3};
-    for (auto p = Begin(a); p != End(a); ++p){
-        cout << *p << " ";
-    }
-    cout << endl;
+    // int a[3] = {1, 2, 3};
+    // for (auto p = Begin(a); p != End(a); ++p){
+    //     cout << *p << " ";
+    // }
+    // cout << endl;
 
     // 16.7
     // int a[2];
     // string b[get_size(a)];
     // cout << get_size(b) << endl;
 
+    // 16.12
+    MyBlob<int> mb1, mb2{1, 2, 3}, mb3(std::move(mb2));
+    MyBlob<string> mb4{"abc", "def", "ghi"}, mb5(mb4), mb6(std::move(mb5));
+    mb1 = mb3;
+    mb4.push_back("ace");
+    mb5 = std::move(mb4);
+    mb5.pop_back();
+    mb6 = std::move(mb5);
+    mb6[2] = "mnk";
+    cout << mb1[0] << " " << mb2[1] << " " << mb3[2] << endl;
+    for (auto iter = mb6.begin(); iter != mb6.end() - 1; ++iter) {
+        cout << *(iter + 1) << " " << iter - mb6.begin() << " " << iter - mb6.end() << " ";
+    }
+    cout << endl;
+    
     return 0;
 }
