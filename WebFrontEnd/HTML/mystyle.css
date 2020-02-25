@@ -1,0 +1,14 @@
+q{font-style: italic;}
+.card{
+    font-size: larger;
+    color: dodgerblue;
+    background-color: khaki;
+    margin: 20px;
+    padding: 5px;
+}
+.card h3 {font-style: italic;}
+.card table{border-color: skyblue;border-style: dashed;}
+.form{font-size: larger; margin: 20px;}
+.form input{font-size: medium;margin: 10px;}
+.form select{font-size: medium;margin: 5px;}
+.form option{font-size: medium;}
