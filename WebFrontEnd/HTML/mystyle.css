@@ -1,14 +1,102 @@
-q{font-style: italic;}
-.card{
+q {
+    font-style: italic;
+}
+
+.card {
     font-size: larger;
     color: dodgerblue;
     background-color: khaki;
     margin: 20px;
     padding: 5px;
 }
-.card h3 {font-style: italic;}
-.card table{border-color: skyblue;border-style: dashed;}
-.form{font-size: larger; margin: 20px;}
-.form input{font-size: medium;margin: 10px;}
-.form select{font-size: medium;margin: 5px;}
-.form option{font-size: medium;}
+
+.card h3 {
+    font-style: italic;
+}
+
+.card table {
+    border-color: skyblue;
+    border-style: dashed;
+}
+
+.form {
+    font-size: larger;
+    margin: 20px;
+}
+
+.form input {
+    font-size: medium;
+    margin: 10px;
+}
+
+.form select {
+    font-size: medium;
+    margin: 5px;
+}
+
+.form option {
+    font-size: medium;
+}
+
+/* 注释 */
+#text1 {
+    text-align: center;
+    font-style: italic;
+}
+
+p.special {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: lightcoral;
+}
+
+hr.navi {
+    position: sticky;
+    top: 10px;
+    left: 10px;
+}
+
+a.redlink:hover {
+    color: lightcoral;
+}
+
+p.intro::first-letter {
+    font-size: xx-large;
+}
+
+/* div.navi {
+    position: -webkit-sticky;
+    position: sticky;
+    top:20px;
+} */
+
+.navi {
+    position: sticky;
+    top: 0px;
+    background-color: rgb(250, 250, 250);
+}
+
+.navi ul {
+    list-style-type: none;
+    margin: 20px;
+    overflow: hidden;
+}
+
+.navi li {
+    float: left;
+}
+
+.navi li a {
+    display: block;
+    padding: 15px 15px;   
+    text-decoration: None;
+    color: rgb(80, 80, 80);
+}
+
+.navi li a:hover:not(.active) {
+    background-color: dimgrey;
+    color: white;
+}
+
+.navi li a.active {
+    color: yellow;
+}

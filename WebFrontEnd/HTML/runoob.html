@@ -5,19 +5,23 @@
     <meta charset="utf-8">
     <title>HTML学习与测试</title>
     <link rel="stylesheet" type="text/css" href="mystyle.css" />
+    <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
     <style type="text/css">
         h1 {
             color: blue;
-        }
-
-        a {
-            color: cadetblue;
         }
     </style>
 </head>
 
 <body>
     <h1>标题</h1>
+    <div class="navi">
+        <ul>
+            <li><a href="https://www.baidu.com" target="_blank">百度</a></li>
+            <li><a href="https://www.qq.com" target="_blank">腾讯</a></li>
+            <li><a href="https://www.sina.com.cn" target="_blank">新浪</a></li>
+        </ul>
+    </div>
     <h2>段落</h2>
     <p>第一段和第二段之间自动换行并加空行</p>
     <p>第二段</p>
@@ -88,8 +92,8 @@
     <p style="background-color: rgb(244, 245, 179);color: darkcyan;text-align: center;">段落为元素的style属性定义的样式</p>
 
     <h2>图片</h2>
-    <img src="smiley.gif" width="50" height="50"/><br />
-    <img src="smile.gif" alt="无法加载时用这段文字替代" />
+    <img id="img1" src="smiley.gif" width="50" height="50"/><br />
+    <!-- <img src="smile.gif" alt="无法加载时用这段文字替代" /> -->
 
     <h2>表格</h2>
     <table border="1" cellpadding="10">
@@ -212,21 +216,25 @@
     </form>
 
     <h2>响应式设计</h2>
-    <p>Bootstrap是开发响应式web框架，可以在缩放尺寸。</p>
+    <p class="intro">Bootstrap是开发响应式web框架，可以在缩放尺寸。</p>
 
     <h2>框架</h2>
-    <iframe src="https://www.bing.com" name="iframe1" frameborder="0" width="1000" height="500"></iframe>
-    <p><a href="https://www.baidu.com" target="iframe1">在框里显示百度</a></p>
-    <p><a href="https://www.bing.com" target="iframe1">在框里显示必应</a></p>
+    <iframe name="iframe1" frameborder="0" width="1000" height="500"></iframe>
+    <p><a class="redlink" href="https://www.baidu.com" target="iframe1">在框里显示百度</a></p>
+    <p><a href="https://www.sogou.com" target="iframe1">在框里显示搜狗</a></p>
 
     <h2>脚本</h2>
-    <p id="text1">可以动态操作和内容更新等</p>
-    <button type="button" onclick="changeText()">点击改变文本</button>
+    <p id="text1" class="special">可以动态操作和内容更新等</p>
+    <button type="button" onclick="changeText()">点击改变文本</button><br/>
+    <button type="button" id="btn1">点击</button><br />
+    <div id="data1"></div>
     <script>
         function changeText() {
             document.getElementById("text1").style.color="blue";
         }
     </script>
+    <script>console.log("hello world");</script>
+    <script src="scripts.js"></script>
 </body>
 
 </html>
