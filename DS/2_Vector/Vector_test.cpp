@@ -15,6 +15,10 @@ ostream& printVector(Vector<T> v, ostream& os = cout) {
     return os;
 }
 
+void travel_ptr(const int& i) {
+    cout << i << " ";
+}
+
 int main(int argc, char const *argv[])
 {
     Vector<int> v;
@@ -50,6 +54,14 @@ int main(int argc, char const *argv[])
     printVector(v);
     cout << "decreasement of len(v): " << v.deduplicate() << endl;
     printVector(v) << endl;
+    /****************测试traverse****************/
+    cout << "test traverse" << endl;
+    auto travel = [](const int &i) { cout << i << " "; };
+    v.traverse(travel);
+    cout << endl;
+    v.traverse(travel_ptr);
+    cout << endl;
+    cout << endl;
     /*****************测试uniquify***************/
     cout << "test uniquify" << endl;
     v.uniquify();
@@ -62,5 +74,29 @@ int main(int argc, char const *argv[])
     printVector(v);
     cout << "decreasement of len(v): " << v.uniquify() << endl;
     printVector(v) << endl;
+    /****************测试search****************/
+    cout << "test search" << endl;
+    int i_search[10] = {1, 2, 2, 2, 3, 3, 5, 8, 8, 9};
+    Vector<int> v_search;
+    for (int i=0; i != 10; ++i) {
+        v_search.insert(i_search[i]);
+    }
+    cout << v_search.search(3) << endl;
+    cout << v_search.search(3, 3, 7) << endl;
+    cout << v_search.search(2, 0, 3) << endl;
+    cout << v_search.search(8, 3, 7) << endl;
+    cout << v_search.search(8, 3, 10) << endl;
+    cout << v_search.search(7) << endl;
+    cout << endl;
+    /****************测试sort*******************/
+    cout << "test sort" << endl;
+    Vector<int> v_sort;
+    int i_sort[10] = {2, 1, 3, 4, 5, 7, 6, 5, 8, 7};
+    for (int i = 0; i != 10; ++i) {
+        v_sort.insert(i_sort[i]);
+    }
+    v_sort.sort();
+    printVector(v_sort) << endl;
+    
     return 0;
 }

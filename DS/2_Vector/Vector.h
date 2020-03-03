@@ -1,3 +1,6 @@
+#include "search.h"
+#include "sort.h"
+
 using Rank = int;
 constexpr int DEFAULT_CAPACITY = 3;
 
@@ -17,7 +20,7 @@ public:
     // 构造函数
     Vector(Rank size = 0, const T& v = T(), Rank capacity = DEFAULT_CAPACITY) 
         : _size(size), _capacity(size > capacity ? size : capacity) 
-    { _elem = new T[_capacity]; for (auto i=0; i!=size; ++i) _elem[i] = v; } // inline
+    { _elem = new T[_capacity]; for (Rank i=0; i!=size; ++i) _elem[i] = v; } // inline
     Vector(T const * A, Rank n) { copyFrom(A, 0, n); } // inline
     Vector(T const * A, Rank lo, Rank hi) { copyFrom(A, lo, hi); } // inline
     Vector(const Vector<T>& v) { copyFrom(v._elem, 0, v._size); } // inline
@@ -43,7 +46,8 @@ public:
     Rank insert(const T& e) { return insert(_size, e); } // inline
     T remove(Rank r);
     int remove(Rank lo, Rank hi);
-    void sort();
+    void sort() { sort(0, _size); } // inline
+    void sort(Rank lo, Rank hi);
     int deduplicate();
     int uniquify();
 
@@ -63,7 +67,7 @@ void Vector<T>::copyFrom(T const* A, Rank lo, Rank hi) {
     _size = hi - lo;
     _capacity = 2 * _size;
     _elem = new T[_capacity];
-    for (auto i = 0; i != _size; ++i) {
+    for (Rank i = 0; i != _size; ++i) {
         _elem[i] = A[lo + i];
     }
 }
@@ -75,7 +79,7 @@ void Vector<T>::expand() {
     if (_capacity < DEFAULT_CAPACITY)
         _capacity = DEFAULT_CAPACITY;
     auto new_elem = new T[_capacity * 2];
-    for (auto i = 0; i != _size; ++i) 
+    for (Rank i = 0; i != _size; ++i) 
         new_elem[i] = _elem[i];
     delete [] _elem;
     _elem = new_elem;
@@ -89,7 +93,7 @@ void Vector<T>::shrink() {
         return;
     
     auto new_elem = new T[_capacity / 2];
-    for (auto i = 0; i != _size; ++i) {
+    for (Rank i = 0; i != _size; ++i) {
         new_elem[i] = _elem[i];
     }
     delete [] _elem;
@@ -101,7 +105,7 @@ void Vector<T>::shrink() {
 template <typename T>
 int Vector<T>::disordered() const {
     int cnt = 0;
-    for (auto i = 0; i != _size - 1; ++i) {
+    for (Rank i = 0; i != _size - 1; ++i) {
         if (_elem[i] > _elem[i + 1])
             ++cnt;
     }
@@ -110,16 +114,17 @@ int Vector<T>::disordered() const {
 
 template <typename T>
 Rank Vector<T>::find(const T& e, Rank lo, Rank hi) const {
-    auto i = hi - 1; 
+    Rank i = hi - 1; 
     while (i >= lo && _elem[i] != e) 
         --i;
     return i; // i < lo表示未找到
 }
 
-// template <typename T>
-// Rank Vector<T>::search(const T& e, Rank lo, Rank hi) const { // 有序
-
-// }
+template <typename T>
+Rank Vector<T>::search(const T& e, Rank lo, Rank hi) const { // 有序
+    // return fibSearch(_elem, e, lo, hi);
+    return binarySearch(_elem, e, lo, hi);
+}
 
 /******************可写访问接口*********************/
 template <typename T>
@@ -132,7 +137,7 @@ Vector<T>& Vector<T>::operator=(const Vector<T>& rv) {
 template <typename T>
 Rank Vector<T>::insert(Rank r, const T& e) {
     expand();
-    for (auto i = _size; i > r; --i) {
+    for (Rank i = _size; i > r; --i) {
         _elem[i] = _elem[i - 1];
     }
     _elem[r] = e;
@@ -151,7 +156,7 @@ template <typename T>
 int Vector<T>::remove(Rank lo, Rank hi) {
     if (lo == hi)
         return 0;
-    for (auto i = 0; i != _size - hi; ++i) {
+    for (Rank i = 0; i != _size - hi; ++i) {
         _elem[lo + i] = _elem[hi + i];
     }
     _size -= hi - lo;
@@ -160,9 +165,15 @@ int Vector<T>::remove(Rank lo, Rank hi) {
 }
 
 template <typename T>
+void Vector<T>::sort(Rank lo, Rank hi) {
+    // bubbleSort(_elem, lo, hi);
+    mergeSort(_elem, lo, hi);
+}
+
+template <typename T>
 int Vector<T>::deduplicate() {
     auto old_size = _size;
-    for (auto i = 0; i != _size; ) {
+    for (Rank i = 0; i != _size; ) {
         if (find(_elem[i], 0, i) != -1)
             remove(i);
         else
@@ -174,7 +185,7 @@ int Vector<T>::deduplicate() {
 template <typename T>
 int Vector<T>::uniquify() {
     Rank new_end = 0;
-    auto i = 1;
+    Rank i = 1;
     for (; i != _size; ++i) {
         if (_elem[i] != _elem[new_end]) {
             _elem[++new_end] = _elem[i];
@@ -188,14 +199,14 @@ int Vector<T>::uniquify() {
 /**********************遍历*************************/
 template <typename T>
 void Vector<T>::traverse(void (*visit)(T& )) {
-    for (auto i=0; i != _size; ++i) {
+    for (Rank i=0; i != _size; ++i) {
         visit(_elem[i]);
     }
 }
 
 template <typename T> template <typename VST>
 void Vector<T>::traverse(VST& visit) {
-    for (auto i=0; i != _size; ++i) {
+    for (Rank i=0; i != _size; ++i) {
         visit(_elem[i]);
     }
 }
