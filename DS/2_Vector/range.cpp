@@ -59,7 +59,7 @@ int main(int argc, char const *argv[])
     for (int i = 0; i != m; ++i) {
         scanf("%d %d", &lo, &hi);
         // lo = v.search(lo - 1);
-        // hi = v.search(hi);
+        // hi = v.search(hi); 
         lo = search(v, lo - 1, 0, n);
         hi = search(v, hi, 0, n);
         printf("%d\n", hi - lo);
