@@ -82,5 +82,14 @@ int main(int argc, char const *argv[])
     printList(l) << endl;
     cout << endl;
 
+    /**************测试reverse************/
+    cout << "test reverse" << endl;
+    l.reverse();
+    printList(l) << endl;
+    l.insertAsLast(0);
+    l.reverse();
+    printList(l) << endl;
+    cout << endl;
+
     return 0;
 }

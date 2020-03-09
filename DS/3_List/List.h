@@ -48,7 +48,8 @@ public:
     void sort(Posi<T> p, int n);
     int deduplicate(); // 无序去重
     int uniquify(); // 有序去重
-    void reverse();
+    void reverse() { reverse(first(), last()); }
+    void reverse(Posi<T> pl, Posi<T> ph);
     // 遍历
     void traverse(void (*visit)(const T &e));
     template <typename VST> void traverse(VST &visit);  
@@ -274,6 +275,20 @@ template<typename T> int List<T>::uniquify() { // 有序去重
         }
     }
     return old_size - _size;
+}
+
+template<typename T> void swap(T& a, T&b) {
+    T tmp = b;
+    b = a;
+    a = tmp;
+}
+
+template<typename T> void List<T>::reverse(Posi<T> pl, Posi<T> ph) {
+    while (pl != ph && pl->pred != ph) {
+        swap(pl->data, ph->data);
+        pl = pl->succ;
+        ph = ph->pred;
+    }
 }
 
 /*********************遍历*************************/
