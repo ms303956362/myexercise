@@ -1,32 +1,52 @@
 #include <cstdio>
-#include "List.h"
-List<char> l;
-Posi<char> pl, pr; // 光标在指向元素的左侧间隙，范围[first(), trailer]
+#include <cstring>
+#include "List1.h"
+
+List<char> l(3200000);
+Pos pl, pr; // 光标在指向元素的左侧间隙，范围[first(), trailer]
                    // 插入等价于insertB(p, e)，删除等价于remove(p)
 int rl, rr; // 左右光标的rank
 
-char move(char dir_p, Posi<char>& p) {
+void read(List<char>& l) {
+    scanf("%s", l._elem);
+    l._size = strlen(l._elem);
+    // 处理哨兵节点
+    l._prev[0] = l.header;
+    l._succ[l._size - 1] = l.trailer;
+    l._succ[l.header] = 0;
+    l._prev[l.trailer] = l._size - 1;
+    // 其他节点
+    for (int i = 0; i != l._size; ++i) {
+        if (i != 0)
+            l._prev[i] = i - 1;
+        if (i != l._size - 1)
+            l._succ[i] = i + 1;
+    }
+    l.free = l._size;
+}
+
+char move(char dir_p, Pos& p) {
     char res = 'T';
     int& rp = (&p == &pl ? rl : rr);
     if (dir_p == 'l') { // 向左移动
         if (p == l.first()) // 到头
             res = 'F';
         else{
-            p = p->pred;
+            p = l.prev(p);
             --rp;
         }
     } else {    // 向右移动
-        if (p == l.last()->succ) // 到头
+        if (p == l.succ(l.last())) // 到头
             res = 'F';
         else {
-            p = p->succ;
+            p = l.succ(p);
             ++rp;
         }
     }
     return res;
 }
 
-char insert(Posi<char>& p, char ch) {
+char insert(Pos& p, char ch) {
     l.insertB(p, ch);
     int &rp = (&p == &pl ? rl : rr), &r_another = (&p == &pl ? rr : rl);
     if (r_another >= rp)   // 未操作光标在操作光标右侧
@@ -35,13 +55,13 @@ char insert(Posi<char>& p, char ch) {
     return 'T';
 }
 
-char del(Posi<char>& p) {
+char del(Pos& p) {
     char res = 'T';
     int &rp = (&p == &pl ? rl : rr), &r_another = (&p == &pl ? rr : rl);
-    Posi<char> &p_another = (&p == &pl ? pr : pl);
+    Pos &p_another = (&p == &pl ? pr : pl);
     if (l.valid(p)) { // 光标不在trailer
         bool eq = (p == p_another); // 两光标是否重合
-        Posi<char> succ = p->succ;
+        Pos succ = l.succ(p);
         l.remove(p);
         p = succ;
         if (eq)
@@ -54,10 +74,10 @@ char del(Posi<char>& p) {
     return res;
 }
 
-char rev(Posi<char>& pl, Posi<char>& pr) {
+char rev(Pos& pl, Pos& pr) {
     char res;
     if (rr - rl >= 1){
-        l.reverse(pl, pr->pred);
+        l.reverse(pl, l.prev(pr));
         res = 'T';
     } else {
         res = 'F';
@@ -66,8 +86,8 @@ char rev(Posi<char>& pl, Posi<char>& pr) {
 }
 
 void show() {
-    for (Posi<char> p = l.first(); p != l.last()->succ; p = p->succ) {
-        printf("%c", p->data);
+    for (Pos p = l.first(); p != l.succ(l.last()); p = l.succ(p)) {
+        printf("%c", l.elem(p));
     }
     printf("\n");
 }
@@ -78,16 +98,11 @@ int main(int argc, char const *argv[])
     setvbuf(stdout, new char[1 << 20], _IOFBF, 1 << 20);
 
     // 读取初始序列
-    char *s = new char[3200003];
-    scanf("%s", s);
-    for (int i = 0; s[i] != '\0'; ++i) {
-        l.insertAsLast(s[i]);
-    }
-    delete[] s;
+    read(l);
     rl = 0;
     rr = l.size();
     pl = l.first();
-    pr = l.last()->succ;
+    pr = l.succ(l.last());
 
     // 操作
     int n;
