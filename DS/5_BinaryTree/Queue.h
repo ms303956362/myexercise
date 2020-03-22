@@ -1,9 +1,11 @@
+#pragma once
 #include "List.h"
 
 template<typename T>
 class Queue: public List<T> {
-    void enqueue(const T &e) { insertAsLast(e); }
-    T dequeue() { return remove(first()); }
-    T &front() { return first()->data; }
-    T &rear() { return last()->data; }
+public:
+    void enqueue(const T &e) { this->insertAsLast(e); }
+    T dequeue() { return this->remove(this->first()); }
+    T &front() { return this->first()->data; }
+    T &rear() { return this->last()->data; }
 };
