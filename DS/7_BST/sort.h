@@ -1,3 +1,4 @@
+#pragma once
 using Rank = int;
 
 template <typename T>

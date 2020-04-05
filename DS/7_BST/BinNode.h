@@ -1,3 +1,4 @@
+#pragma once
 #include "Stack.h"
 #include "Queue.h"
 
