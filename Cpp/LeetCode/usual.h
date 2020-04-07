@@ -16,6 +16,7 @@
 #include <unordered_set>
 // algorithm
 #include <algorithm>
+#include <cmath>
 // utility
 #include <initializer_list>
 #include <iterator>
