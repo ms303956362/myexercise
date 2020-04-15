@@ -30,5 +30,35 @@ int main(int argc, char const *argv[])
     bst.remove(36);
     bst.travIn(vst);
     cout << endl << endl;
+    // 测试AVL构建树
+    cout << "test AVL building" << endl;
+    AVL<int> avl;
+    avl.insert(36);
+    avl.insert(27);
+    avl.insert(58);
+    avl.insert(6);
+    avl.insert(53);
+    avl.insert(69);
+    avl.insert(46);
+    cout << "Initialized AVL Tree" << endl;
+    avl.travIn(vst);
+    cout << endl;
+    cout << "height: " << avl.root()->height << endl << endl;
+    cout << "test AVL insert" << endl;
+    // 测试AVL树插入
+    avl.insert(40);
+    avl.travIn(vst);
+    cout << endl;
+    cout << "height: " << avl.root()->height << endl << endl;
+    // 测试AVL树删除
+    cout << "test AVL remove" << endl;
+    avl.remove(53);
+    avl.travIn(vst);
+    cout << endl;
+    cout << "height: " << avl.root()->height << endl << endl;
+    avl.remove(69);
+    avl.travIn(vst);
+    cout << endl;
+    cout << "height: " << avl.root()->height << endl << endl;
     return 0;
 }

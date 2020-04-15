@@ -6,7 +6,7 @@ template <typename T> class BinNode;
 
 template <typename T>
 using BinNodePosi = BinNode<T>*;
-
+#define stature(p) ((p) ? (p)->height : -1)
 enum RBColor { RB_RED, RB_BLACK };
 
 template <typename T>

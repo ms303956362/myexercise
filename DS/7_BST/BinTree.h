@@ -1,6 +1,7 @@
 #pragma once
 #include "BinNode.h"
 #include "release.h"
+#include "BinNode_macro.h"
 
 template <typename T>
 class BinTree {

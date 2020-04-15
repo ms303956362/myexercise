@@ -3,33 +3,29 @@
 #include <climits>
 #include "List.h"
 
-template <class _Tp>
-inline const _Tp& max(const _Tp& __a, const _Tp& __b) {
-  return  __a < __b ? __b : __a;
-}
-
-template <class _Tp>
-inline const _Tp& min(const _Tp& __a, const _Tp& __b) {
-  return  __a < __b ? __a : __b;
-}
-
 int time = 0;
 
 class GraphTable {
 public:
-    char *isM;
+    int *total;
+    int *numM;
+    int endV;
+    int begV;
     GraphTable(int num) : n(num), top(-1) {
-        isM = new char[num];
+        numM = new int[num];
+        total = new int[num];
         belong = new int[num];
         dTime = new int[num];
         low = new int[num];
         stack = new int[num];
         outNbr = new List<int>[num];
         inStack = new char[num];
-        memset(isM, 0, num * sizeof(char));
+        hasEnd = new char[num];
+        memset(total, 0, num * sizeof(int));
         memset(dTime, 0, num * sizeof(int));
         memset(low, 0x3f, num * sizeof(int));
         memset(inStack, 0, num * sizeof(char));
+        memset(hasEnd, 0, num * sizeof(char));
         for (int v = 0; v != num; ++v)
             belong[v] = v;
     }
@@ -59,14 +55,63 @@ public:
                     }
                 }
             } else { // 强连通分量内其他节点，向外邻居转接的超节点处
-                for (Posi<int> pu = outNbr[v].first(); pu != outNbr[v].last()->succ; pu = pu->succ) {
+                for (Posi<int> pu = outNbr[v].first(); pu != outNbr[v].last()->succ; ) {
                     int u = pu->data;
-                    if (belong[v] != u && u != v) {
-                        outNbr[v].insertAsLast(belong[u]);
+                    if (u != belong[v] && belong[u] != belong[v]) { // 原邻居u不是v的超节点，且原邻居u的超节点与v的超节点不同
+                        Posi<int> tmp = pu->succ;
+                        outNbr[v].remove(pu);
+                        outNbr[belong[v]].insertAsLast(belong[u]);
+                        pu = tmp;
+                    } else {
+                        pu = pu->succ;
                     }
                 }
             }
         }
+        for (int v = 0; v != n; ++v) {
+            if (v != belong[v])
+                numM[belong[v]] += numM[v];
+        }
+        begV = belong[0];
+        endV = belong[n - 1];
+        memset(inStack, 0, n * sizeof(char));
+    }
+
+    void tSort(int v) {
+        inStack[v] = 1;
+        if (v == endV) {
+            total[v] = numM[v];
+            hasEnd[v] = 1;
+            return;
+        }
+        int max_v = 0;
+        for (Posi<int> pu = outNbr[v].first(); pu != outNbr[v].last()->succ; pu = pu->succ) {
+            int u = pu->data;
+            if (u != belong[u])
+                continue;
+            switch (inStack[u]) {
+            case 0:
+                tSort(u);
+                if (hasEnd[u]) {
+                    if (total[u] + numM[v] > max_v)
+                        max_v = total[u] + numM[v];
+                    hasEnd[v] = 1;
+                }
+                break;
+            
+            case 1:
+                if (hasEnd[u]) {
+                    if (total[u] + numM[v] > max_v)
+                        max_v = total[u] + numM[v];
+                    hasEnd[v] = 1;
+                }
+                break;
+
+            default:
+                break;
+            }
+        }
+        total[v] = max_v;
     }
 
 private: 
@@ -78,6 +123,7 @@ private:
     int *stack;
     List<int> *outNbr;
     char *inStack;
+    char *hasEnd;
 
     void Tarjan(int v) {
         ++time;
@@ -105,3 +151,25 @@ private:
         }
     }
 };
+
+int main(int argc, char const *argv[])
+{
+    int n, m;
+    scanf("%d %d", &n, &m);
+    char *s = new char[n + 1];
+    scanf("%s", s);
+    GraphTable g(n);
+    for (int v = 0; v != n; ++v) {
+        g.numM[v] = s[v] == 'M' ? 1 : 0;
+    }
+    int v, u;
+    for (int i = 0; i != m; ++i) {
+        scanf("%d %d", &v, &u);
+        g.insertEdge(v, u);
+    }
+    g.tarjan(0);
+    g.shrink();
+    g.tSort(g.begV);
+    printf("%d", g.total[g.begV]);
+    return 0;
+}

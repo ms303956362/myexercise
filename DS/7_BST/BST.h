@@ -1,5 +1,6 @@
 #pragma once
 #include "BinTree.h"
+#include "BinNode_macro.h"
 
 template <typename T>
 class BST : public BinTree<T> {
@@ -53,7 +54,7 @@ BinNodePosi<T> BST<T>::rotateAt(BinNodePosi<T> x) {
             return connect34(x, p, g, x->lc, x->rc, p->rc, g->rc);
         } else {
             x->parent = g->parent;
-            return connect34(g, x, p, g->lc, x->lc, x->rc, f->rc);
+            return connect34(g, x, p, g->lc, x->lc, x->rc, p->rc);
         }
     } else {
         if (IsLChild(*p)) {
