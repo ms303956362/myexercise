@@ -40,8 +40,8 @@ BinNodePosi<T> BST<T>::connect34(BinNodePosi<T> a, BinNodePosi<T> b, BinNodePosi
     b->rc = c;
     c->parent = b;
     this->updateHeight(a);
-    this->updateHeight(b);
     this->updateHeight(c);
+    this->updateHeight(b);
     return b;
 }
 

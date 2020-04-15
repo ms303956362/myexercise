@@ -52,10 +52,12 @@ int main(int argc, char const *argv[])
     cout << "height: " << avl.root()->height << endl << endl;
     // 测试AVL树删除
     cout << "test AVL remove" << endl;
+    avl.insert(30);
+    avl.insert(2);
+    avl.insert(29);
+    avl.insert(33);
+    avl.insert(28);
     avl.remove(53);
-    avl.travIn(vst);
-    cout << endl;
-    cout << "height: " << avl.root()->height << endl << endl;
     avl.remove(69);
     avl.travIn(vst);
     cout << endl;
