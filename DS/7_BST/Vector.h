@@ -11,13 +11,13 @@ protected:
     // 内部变量
     Rank _size;
     Rank _capacity;
-    T* _elem;
     // 内部函数
     void copyFrom(T const* A, Rank lo, Rank hi);
     void expand();
     void shrink();
 
 public:
+    T* _elem;
     // 构造函数
     Vector(Rank size = 0, const T& v = T(), Rank capacity = DEFAULT_CAPACITY) 
         : _size(size), _capacity(size > capacity ? size : capacity) 

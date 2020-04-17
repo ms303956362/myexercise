@@ -11,7 +11,7 @@ public:
 
 template<typename T>
 BinNodePosi<T> AVL<T>::insert(const T &e) {
-    BinNodePosi<T> &x = this->search(e);
+    BinNodePosi<T> &x = this->search1(e);
     if (x)
         return x;
     x = new BinNode<T>(e, this->_hot);

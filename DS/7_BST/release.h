@@ -8,20 +8,20 @@
 
 #pragma once
 
-#include <typeinfo.h>
+// #include <typeinfo.h>
 
 /******************************************************************************************
- * ÁÐ±í¡¢ÏòÁ¿µÈ½á¹¹ÄÚµÄ½ÚµãÖÐ£¬¿ÉÒÔ´æ·Å»ù±¾ÀàÐÍ»ò¹¹ÔìÀàÐÍ
- * °´ÕÕ±¾ÊéÔ¼¶¨£¬³öÓÚÐ§ÂÊµÄ¿¼ÂÇ£¬¶ÔÓÚºóÒ»Çé¿öÍ¨³£Ö»±£´æ¶ÔÏóµÄÖ¸Õë
- * Òò´Ë£¬ÔÚÖ÷Ìå½á¹¹Îö¹¹Ö®Ç°£¬ÐèÒªÊ×ÏÈÊÍ·ÅÕâÐ©³ÉÔ±¶ÔÏóËùÕ¼µÄ¿Õ¼ä
- * ´Ë´¦£¬½èÖúC++ÖÐÆ«ÌØ»¯¼¼ÊõÇø·ÖÉÏÊöÁ½ÖÖÇé¿ö£¬²¢×ö¶ÔÓ¦´¦Àí
+ * ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È½á¹¹ï¿½ÚµÄ½Úµï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½Ô´ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * ï¿½ï¿½ï¿½Õ±ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ÊµÄ¿ï¿½ï¿½Ç£ï¿½ï¿½ï¿½ï¿½Úºï¿½Ò»ï¿½ï¿½ï¿½Í¨ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
+ * ï¿½ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½ï¿½ï¿½Ö®Ç°ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½Ð©ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½Ä¿Õ¼ï¿½
+ * ï¿½Ë´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½C++ï¿½ï¿½Æ«ï¿½Ø»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½
  ******************************************************************************************/
 
 template <typename T> struct Cleaner {
-   static void clean ( T x ) { //Ïàµ±ÓÚµÝ¹é»ù
+   static void clean ( T x ) { //ï¿½àµ±ï¿½ÚµÝ¹ï¿½ï¿½
 #ifdef _DEBUG
       static int n = 0;
-      if ( 7 > strlen ( typeid ( T ).name() ) ) { //¸´ÔÓÀàÐÍÒ»¸ÅºöÂÔ£¬Ö»Êä³ö»ù±¾ÀàÐÍ
+      if ( 7 > strlen ( typeid ( T ).name() ) ) { //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Åºï¿½ï¿½Ô£ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
          printf ( "\t<%s>[%d]=", typeid ( T ).name(), ++n );
          print ( x );
          printf ( " purged\n" );
@@ -32,7 +32,7 @@ template <typename T> struct Cleaner {
 
 template <typename T> struct Cleaner<T*> {
    static void clean ( T* x ) {
-      if ( x ) { delete x; } //Èç¹ûÆäÖÐ°üº¬Ö¸Õë£¬µÝ¹éÊÍ·Å
+      if ( x ) { delete x; } //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð°ï¿½ï¿½ï¿½Ö¸ï¿½ë£¬ï¿½Ý¹ï¿½ï¿½Í·ï¿½
 #ifdef _DEBUG
       static int n = 0;
       printf ( "\t<%s>[%d] released\n", typeid ( T* ).name(), ++n );
