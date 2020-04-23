@@ -77,15 +77,47 @@ struct RangeTree {
         long long sum = 0;
         int cnt = 0;
         // 找lca
-        while (1) {
-            if (x2 <= r->x) // 左子树包含r节点的值，必须r->x严格小于x2才说明x2在r右子树
+        while (r) {
+            if (x2 < r->x) // x2必须严格小于r->x，x2才全都在左子树
                 r = r->lc;
             else if (r->x < x1)
                 r = r->rc;
             else
                 break;
         }
-        // 
+        if (!r)
+            return 0;
+        // 分头查找
+        RNode* lt = r->lc ? r->lc : r, *rt = r->rc; // r为叶节点只需遍历一次r->v
+        while (lt) {
+            if (x1 <= lt->x) {  // x1在lt左子树，则右子树全在[x1, x2]内，查找y，深入左子树
+                Vector<Temp> &v = lt->rc ? lt->rc->v : lt->v; // 只可能两个孩子或叶节点
+                int last = v.search(y2);
+                while (0 <= last && y1 <= v[last].y) {
+                    sum += v[last].temp;
+                    --last;
+                    ++cnt;
+                }
+                lt = lt->lc;
+            } else {  // lt->x < x1，左子树全不在[x1, x2]内，深入右子树
+                lt = lt->rc;
+            }
+        }
+        while (rt) {
+            if (rt->x <= x2) {  // x2可能在rt右子树，左子树全在[x1, x2]内
+                Vector<Temp> &v = rt->lc ? rt->lc->v : rt->v;
+                int last = v.search(y2);
+                while (0 <= last && y1 <= v[last].y) {
+                    sum += v[last].temp;
+                    --last;
+                    ++cnt;
+                }
+                rt = rt->rc;
+            } else {    // x2 < rt->x，左子树不全在[x1, x2]内，深入左子树查找
+                rt = rt->lc;
+            }
+        }
+        return cnt == 0 ? 0 : sum / cnt;
     }
 };
 
