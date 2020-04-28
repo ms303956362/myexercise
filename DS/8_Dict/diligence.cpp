@@ -26,6 +26,8 @@ static size_t hashCode(const String& s) { return hashCode(s.s); }
 
 int main(int argc, char const *argv[])
 {
+    setvbuf(stdin, new char[1 << 20], _IOFBF, 1 << 20);
+    setvbuf(stdout, new char[1 << 20], _IOFBF, 1 << 20);
     int n;
     char s[10];
     HashTable<String, int> ht(20011);
@@ -33,7 +35,7 @@ int main(int argc, char const *argv[])
     while (n-- > 0) {
         scanf("%s", s);
         int *p = ht.get(s);
-        if (p)
+        if (p) 
             ++*p;
         else
             ht.put(s, 1);

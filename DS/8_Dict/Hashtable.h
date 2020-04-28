@@ -41,31 +41,35 @@ public:
 // static size_t hashCode(char c) { return static_cast<size_t>(c); }
 // static size_t hashCode(int k) { return static_cast<size_t>(k); }
 // static size_t hashCode(long long i) { return static_cast<size_t>((i >> 32) + static_cast<int>(i)); }
-static size_t hashCode(const char* s) {
-    int h = 0;
-    size_t n = strlen(s);
-    for (size_t i = 0; i != n; ++i) {
+static long long hashCode(const char* s) {
+    long long h = 0;
+    int n = strlen(s);
+    for (int i = 0; i != n; ++i) {
         h = (h << 5) | (h >> 27); // 循环左移5位
-        h += static_cast<int>(s[i]);
+        h += static_cast<long long>(s[i]);
     }
-    return static_cast<size_t>(h);
+    return h;
 }
 
 /*********************保护***************************/
 template<typename K, typename V>
 int HashTable<K, V>::probe4Hit(const K &k) { // 找匹配
-    int r = hashCode(k) % M;
+    long long c = hashCode(k) % M, r = c;
+    int i = 1;
     while ((ht[r] && ht[r]->key != k) || (!ht[r] && isLzRemoved(r))) {
-        r = (r + 1) % M;
+        r = (c + i * i) % M;
+        ++i;
     }
     return r;
 }
 
 template<typename K, typename V>
 int HashTable<K, V>::probe4Free(const K &k) { // 找空桶
-    int r = hashCode(k) % M;
+    long long c = hashCode(k) % M, r = c;
+    int i = 1;
     while (ht[r]) {
-        r = (r + 1) % M;
+        r = (c + i * i) % M;
+        ++i;
     }
     return r;
 }
