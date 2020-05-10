@@ -4,6 +4,9 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
+import time
+from sklearn.metrics import mean_squared_error
 from dgl.nn.pytorch import GraphConv
 from torch.utils.data import DataLoader, Dataset
 from pypower.api import case24_ieee_rts
@@ -57,30 +60,56 @@ def collate(samples):
 
 
 class GCN(nn.Module):
-    def __init__(self, in_dim, hidden_dim, out_dim):
+    def __init__(self, in_dim, hidden_dim1, hidden_dim2, out_dim):
         super(GCN, self).__init__()
-        self.conv1 = GraphConv(in_dim, hidden_dim)
-        self.conv2 = GraphConv(hidden_dim, hidden_dim)
-        self.linear = nn.Linear(hidden_dim, out_dim)
+        self.conv1 = GraphConv(in_dim, hidden_dim1)
+        self.conv2 = GraphConv(hidden_dim1, hidden_dim2)
+        self.conv3 = GraphConv(hidden_dim2, hidden_dim2)
+        self.linear = nn.Linear(hidden_dim2, out_dim)
 
     def forward(self, g):
         h = g.ndata['x']
         # Perform graph convolution and activation function.
         h = F.relu(self.conv1(g, h))
         h = F.relu(self.conv2(g, h))
+        h = F.relu(self.conv3(g, h))
         g.ndata['h'] = h
         # Calculate graph representation by averaging all the node representations.
         hg = dgl.mean_nodes(g, 'h')
         return F.relu(self.linear(hg))
 
+def test(model, plot=False):
+    eval_dataset = RTSDataset(ppc, 'case24RTS_eval.h5')
+    eval_dataloader = DataLoader(dataset, batch_size=1, shuffle=False, collate_fn=collate)
+    model.eval()
+    pre_risks = []
+    real_risks = []
+    pd_sum = []
+    with torch.no_grad():
+        for inputs, risks in eval_dataloader:
+            inputs = inputs.to(device)
+            pd_sum.append(torch.sum(inputs.ndata['x'][:, 0]).item())
+            risks = risks.to(device)
+            outputs = model(inputs)
+            pre_risks.append(outputs.item())
+            real_risks.append(risks.item())
+    model.train()
+    if plot:
+        plt.figure()
+        plt.scatter(np.array(pd_sum), np.array(real_risks))
+        plt.scatter(np.array(pd_sum), np.array(pre_risks))
+        plt.show()
+    return np.sqrt(mean_squared_error(real_risks, pre_risks))
 
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
     learning_rate = 0.01
     batch_size = 150
-    num_epoches = 200
+    num_epoches = 300
     input_size = 6
     output_size = 1
-    hidden_size = 20
+    hidden_size1 = 50
+    hidden_size2 = 20
 
     # 载入电网模型
     ppc = case24_ieee_rts()
@@ -89,7 +118,7 @@ if __name__ == "__main__":
 
     # Create model
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    model = GCN(input_size, hidden_size, output_size)
+    model = GCN(input_size, hidden_size1, hidden_size2, output_size)
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
         model = nn.DataParallel(model)
@@ -98,7 +127,9 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     model.train()
 
+    rmse_list = []
     epoch_losses = []
+    t1 = time.time()
     for epoch in range(num_epoches):
         epoch_loss = 0
         for i, (bg, label) in enumerate(data_loader):
@@ -111,6 +142,21 @@ if __name__ == "__main__":
             optimizer.step()
             epoch_loss += loss.detach().item()
         epoch_loss /= (i + 1)
-        if (epoch + 1) % 10 == 0:
+        if (epoch + 1) % 20 == 0:
             print('Epoch {}, loss {:.4f}'.format(epoch + 1, epoch_loss))
         epoch_losses.append(epoch_loss)
+    t2 = time.time()
+    print(t2 - t1)
+    
+    t1 = time.time()
+    print(test(model))
+    t2 = time.time()
+    print(t2 - t1)
+    plt.rcParams['font.sans-serif'] = ['STSong']
+    plt.figure()
+    plt.plot(epoch_losses)
+    plt.tick_params(labelsize=20)
+    plt.xlabel('迭代次数 / 次', fontsize=20)
+    plt.ylabel('损失函数 / MW^2', fontsize=20)
+    plt.savefig('rmse_list.png', bbox_inches='tight')
+    plt.show()
