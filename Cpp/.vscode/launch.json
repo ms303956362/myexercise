@@ -22,5 +22,12 @@
             }
         ],
         "preLaunchTask": "Compile" // 调试会话开始前执行的任务，一般为编译程序。与tasks.json的label相对应
-    }]
+    },
+    {
+        "name": "Python：当前文件",
+        "type": "python",
+        "request": "launch",
+        "program": "${file}",
+        "console": "integratedTerminal"
+    },]
 }
