@@ -1,7 +1,8 @@
 {
     "code-runner.executorMap": {
-        "python": "D:\\Program\\Anaconda3\\envs\\pytorch\\python.exe"
+        // "python": "D:\\Program\\Anaconda3\\envs\\pytorch\\python.exe"
     },
     "code-runner.runInTerminal": true,
-    "python.pythonPath": "D:\\Program\\Anaconda3\\envs\\pytorch\\python.exe",
+    "python.pythonPath": "D:\\Program\\Anaconda3\\envs\\introRL\\python.exe",
+    // "python.pythonPath": "D:\\Program\\Anaconda3\\envs\\pytorch\\python.exe",
 }
