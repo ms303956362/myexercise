@@ -5,10 +5,10 @@
 
     "code-runner.runInTerminal": true, // 设置成false会在“输出”中输出，无法输入
     "code-runner.executorMap": {
-        "c": "cd $dir && gcc '$fileName' -o './out/$fileNameWithoutExt.exe' -Wall -g -O2 -static-libgcc -std=c11 -fexec-charset=GBK && &'./out/$fileNameWithoutExt'",
-        "cpp": "cd $dir && g++ '$fileName' -o './out/$fileNameWithoutExt.exe' -Wall -g -O2 -static-libgcc -std=c++11 -fexec-charset=GBK && &'./out/$fileNameWithoutExt'"
-        // "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt.exe -Wall -g -O2 -static-libgcc -std=c11 -fexec-charset=GBK && $dir$fileNameWithoutExt",
-        // "cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt.exe -Wall -g -O2 -static-libgcc -std=c++17 -fexec-charset=GBK && $dir$fileNameWithoutExt"
+        // "c": "cd $dir && gcc '$fileName' -o './out/$fileNameWithoutExt.exe' -Wall -g -O2 -static-libgcc -std=c11 -fexec-charset=GBK && &'./out/$fileNameWithoutExt'",
+        // "cpp": "cd $dir && g++ '$fileName' -o './out/$fileNameWithoutExt.exe' -Wall -g -O2 -static-libgcc -std=c++11 -fexec-charset=GBK && &'./out/$fileNameWithoutExt'"
+        "c": "cd $dir && gcc $fileName -o ./out/$fileNameWithoutExt.exe -Wall -g -O2 -static-libgcc -std=c11 -fexec-charset=GBK && cd ./out && $fileNameWithoutExt && cd ../",
+        "cpp": "cd $dir && g++ $fileName -o ./out/$fileNameWithoutExt.exe -Wall -g -O2 -static-libgcc -std=c++17 -fexec-charset=GBK && cd ./out && $fileNameWithoutExt && cd ../"
     }, // 右键run code时运行的命令；未注释的仅适用于PowerShell（Win10默认），文件名中有空格也可以编译运行；注释掉的适用于cmd（win7默认），PS和bash也能用，但文件名中有空格时无法运行
     "code-runner.saveFileBeforeRun": true, // run code前保存
     "code-runner.preserveFocus": true,     // 若为false，run code后光标会聚焦到终端上。如果需要频繁输入数据可设为false
@@ -71,5 +71,5 @@
         "streambuf": "cpp",
         "typeinfo": "cpp"
     },
-    "python.pythonPath": "D:\\Program\\Anaconda3\\envs\\pytorch\\python.exe", // 格式化时调整include的顺序（按字母排序）
+    "python.pythonPath": "D:\\Program\\Anaconda3\\python.exe", // 格式化时调整include的顺序（按字母排序）
 }
