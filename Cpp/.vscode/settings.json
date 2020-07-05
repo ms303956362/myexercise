@@ -5,6 +5,7 @@
 
     "code-runner.runInTerminal": true, // 设置成false会在“输出”中输出，无法输入
     "code-runner.executorMap": {
+        "python": "cd $dir && D:/Programs/anaconda3/python.exe $fileName",
         // "c": "cd $dir && gcc '$fileName' -o './out/$fileNameWithoutExt.exe' -Wall -g -O2 -static-libgcc -std=c11 -fexec-charset=GBK && &'./out/$fileNameWithoutExt'",
         // "cpp": "cd $dir && g++ '$fileName' -o './out/$fileNameWithoutExt.exe' -Wall -g -O2 -static-libgcc -std=c++11 -fexec-charset=GBK && &'./out/$fileNameWithoutExt'"
         "c": "cd $dir && gcc $fileName -o ./out/$fileNameWithoutExt.exe -Wall -g -O2 -static-libgcc -std=c11 -fexec-charset=GBK && cd ./out && $fileNameWithoutExt && cd ../",
@@ -71,5 +72,5 @@
         "streambuf": "cpp",
         "typeinfo": "cpp"
     },
-    "python.pythonPath": "D:\\Program\\Anaconda3\\python.exe", // 格式化时调整include的顺序（按字母排序）
+    "python.pythonPath": "D:/Programs/anaconda3/python.exe", // 格式化时调整include的顺序（按字母排序）
 }
