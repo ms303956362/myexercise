@@ -71,6 +71,5 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "typeinfo": "cpp"
-    },
-    "python.pythonPath": "D:/Programs/anaconda3/python.exe", // 格式化时调整include的顺序（按字母排序）
+    }, // 格式化时调整include的顺序（按字母排序）
 }
