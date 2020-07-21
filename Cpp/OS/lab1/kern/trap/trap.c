@@ -31,6 +31,8 @@ static struct pseudodesc idt_pd = {
     sizeof(idt) - 1, (uintptr_t)idt
 };
 
+extern volatile size_t ticks;
+
 /* idt_init - initialize IDT to each of the entry points in kern/trap/vectors.S */
 void
 idt_init(void) {
@@ -46,6 +48,20 @@ idt_init(void) {
       *     You don't know the meaning of this instruction? just google it! and check the libs/x86.h to know more.
       *     Notice: the argument of lidt is idt_pd. try to find it!
       */
+     extern uintptr_t __vectors[];
+     int i;
+     for (i = 0; i < sizeof(idt) / sizeof(struct gatedesc); ++i) {
+         if (0 <= i && i < 32) {
+            SETGATE(idt[i], 1, KERNEL_CS, __vectors[i], DPL_KERNEL);
+         }
+         else if (i == T_SYSCALL) {
+            SETGATE(idt[i], 0, KERNEL_CS, __vectors[i], DPL_USER);
+         }
+         else
+            SETGATE(idt[i], 0, KERNEL_CS, __vectors[i], DPL_KERNEL);
+     }
+     SETGATE(idt[T_SWITCH_TOK], 0, KERNEL_CS, __vectors[T_SWITCH_TOK], DPL_USER);
+     lidt(&idt_pd);
 }
 
 static const char *
@@ -134,6 +150,8 @@ print_regs(struct pushregs *regs) {
     cprintf("  eax  0x%08x\n", regs->reg_eax);
 }
 
+struct trapframe new_tf;
+
 /* trap_dispatch - dispatch based on what type of trap occurred */
 static void
 trap_dispatch(struct trapframe *tf) {
@@ -147,6 +165,11 @@ trap_dispatch(struct trapframe *tf) {
          * (2) Every TICK_NUM cycle, you can print some info using a funciton, such as print_ticks().
          * (3) Too Simple? Yes, I think so!
          */
+        ++ticks;
+        if (ticks == TICK_NUM) {
+            print_ticks();
+            ticks = 0;
+        }
         break;
     case IRQ_OFFSET + IRQ_COM1:
         c = cons_getc();
@@ -158,8 +181,18 @@ trap_dispatch(struct trapframe *tf) {
         break;
     //LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
     case T_SWITCH_TOU:
+        if (tf->tf_cs == KERNEL_CS) {
+            new_tf = *tf;
+            new_tf.tf_cs = USER_CS;
+            new_tf.tf_ds = USER_DS;
+            *((uint32_t*)tf - 1) = (uintptr_t)(&new_tf);
+        }
+        break;
     case T_SWITCH_TOK:
-        panic("T_SWITCH_** ??\n");
+        if (tf->tf_cs == USER_CS) {
+            tf->tf_cs = KERNEL_CS;
+            tf->tf_ds = KERNEL_DS;
+        }
         break;
     case IRQ_OFFSET + IRQ_IDE1:
     case IRQ_OFFSET + IRQ_IDE2:
