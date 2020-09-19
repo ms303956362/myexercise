@@ -12,7 +12,7 @@ class PowerNet(gym.Env):
         @ppc: dict, pypower case
         @areaBuses: List[List[]], i-th term is the list of bus numbers in i-th area
         @areaGens: List[List[]], i-th term is the list of generator numbers in i-th area
-        @vref: voltage reference
+        @vref: reference voltage of the system, p.u.
         """
         self.ppc = ppc
         self.ppopt = ppoption(PF_ALG=1, VERBOSE=0, OUT_ALL=0)
@@ -47,7 +47,7 @@ class PowerNet(gym.Env):
         batch_size = action[0].shape[0]
         state = [np.zeros((batch_size, dim)) for dim in self.state_dim]
         reward = [np.zeros(batch_size) for _ in range(len(self.areaBuses))]
-        violated = [np.zeros(batch_size) for _ in range(len(self.areaBuses))]
+        terminal = [np.zeros(batch_size) for _ in range(len(self.areaBuses))]
         for i in range(batch_size):
             # set voltage of generators
             for j, gens in enumerate(self.areaGens):
@@ -65,25 +65,28 @@ class PowerNet(gym.Env):
             # caculate the rewards
             reward_bus = self._cal_reward_bus(result['bus'][:, VM])
             for j, r in enumerate(reward):
-                if np.where((0.95 <= result['bus'][:, VM]) * (result['bus'][:, VM] <= 1.05))[0].tolist() == self.areaBuses[j]:
+                # the voltages of all buses in [0.95, 1.05]
+                if np.where((0.95 <= result['bus'][:, VM]) * (result['bus'][:, VM] <= 1.05))[0].tolist() == list(range(len(result['bus'][:, VM]))):
                     r[i] = np.sum(reward_bus) / np.arange(result['bus'].shape[0])
-                elif np.where((0.8 <= result['bus'][:, VM]) * (result['bus'][:, VM]  <= 1.2))[0].tolist() == self.areaBuses[j]:
+                # the voltages of all buses in [0.8, 1.2], and some of them not in [0.95, 1.05]
+                elif np.where((0.8 <= result['bus'][:, VM]) * (result['bus'][:, VM]  <= 1.2))[0].tolist() == list(range(len(result['bus'][:, VM]))):
                     for k, buses in enumerate(self.areaBuses):
                         if k != j:
                             r[i] += self.beta * np.sum(reward_bus[buses])
                         else:
                             r[i] += np.sum(reward_bus[buses])
                     r[i] *= self.alpha
+                # v < 0.8 or v > 1.2 
                 else:
                     r[i] = -5
             # judge whether voltage violation in each area happened
-            for j, vio in enumerate(violated):
+            for j, term in enumerate(terminal):
                 buses = np.array(self.areaBuses[j])
                 if ((0.95 <= result['bus'][buses][:, VM]) * (result['bus'][buses][:, VM] <= 1.05)).all():
-                    vio[i] = True
+                    term[i] = True
                 else:
-                    vio[i] = False
-        return state, reward, violated, {}
+                    term[i] = False
+        return state, reward, terminal, {}
     
     def _cal_inject_power(self, result_bus, result_gen):
         '''
@@ -113,6 +116,7 @@ class PowerNet(gym.Env):
         idx, = np.where((result_v < 0.8) + (result_v > 1.2))
         reward_bus[idx] = -5
         return reward_bus
+
 
 if __name__ == "__main__":
     import torch as t
@@ -178,13 +182,13 @@ if __name__ == "__main__":
     maddpg = MADDPG(
         [Actor(sdim, adim) for sdim, adim in zip(states_dim, actions_dim)],
         [Actor(sdim, adim) for sdim, adim in zip(states_dim, actions_dim)],
-        [Critic(sdim, adim) for sdim, adim in zip(states_dim, actions_dim)],
-        [Critic(sdim, adim) for sdim, adim in zip(states_dim, actions_dim)],
+        [Critic(sum(states_dim), sum(actions_dim)) for _ in range(agent_num)],
+        [Critic(sum(states_dim), sum(actions_dim)) for _ in range(agent_num)],
         [list(range(agent_num))] * agent_num,
         t.optim.Adam,
         nn.MSELoss(reduction='sum')
     )
-
+    
     ppc = case39()
     powerenv = PowerNet(ppc, agentBuses, agentGens)
     states = [t.tensor(st, dtype=t.float32).view(1, st.shape[0])
@@ -193,4 +197,7 @@ if __name__ == "__main__":
         result = maddpg.act([{"state": st} for st in states])
         action = [act.numpy() for act in result]
         states, rewards, violated, _ = powerenv.step(action)
+        states = [t.tensor(st, dtype=t.float32)
+                  for st in states]
+    maddpg.update()
     
