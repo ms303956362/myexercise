@@ -29,6 +29,10 @@ class PowerNet(gym.Env):
     
     def reset(self):
         self.ppc = deepcopy(self.ppc0)
+        # random load level, 0.7~1.3
+        level = 1 + 0.3 * np.random.rand()
+        self.ppc['bus'][:, (PD, QD)] *= level
+        self.ppc['gen'][:, (PG, QG)] *= level
         state = [np.zeros(dim) for dim in self.state_dim]
         state_bus = self.ppc['bus'][:, (PD, QD, VM, VA)]
         state_gen = self.ppc['gen'][:, (GEN_BUS, PG, QG)]
@@ -37,6 +41,17 @@ class PowerNet(gym.Env):
             assert(len(state[j]) / 4 == len(buses))
             state[j] = np.concatenate([state_bus[buses][:, i] for i in range(4)])
         return state
+    
+    def get_state(self, ppc):
+        state = [np.zeros(dim) for dim in self.state_dim]
+        state_bus = ppc['bus'][:, (PD, QD, VM, VA)]
+        state_gen = ppc['gen'][:, (GEN_BUS, PG, QG)]
+        state_bus = self._cal_inject_power(state_bus, state_gen)
+        for j, buses in enumerate(self.areaBuses):
+            assert(len(state[j]) / 4 == len(buses))
+            state[j] = np.concatenate([state_bus[buses][:, i] for i in range(4)])
+        return state
+
 
     def step(self, action):
         '''
