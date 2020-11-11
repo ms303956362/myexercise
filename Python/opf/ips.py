@@ -43,7 +43,6 @@ def ips(f_func: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]],
         gap = np.dot(l, z) - np.dot(u, w)
         if gap < eps:
             converged = True
-            print('Converged in ' + i + ' iterations!')
             break
         
         # 计算扰动因子
@@ -82,15 +81,15 @@ def ips(f_func: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]],
         du = -Lw - dg.T @ dx
         dw = -U_inv @ Lu - U_inv @ W @ du
         dl = Lz + dg.T @ dx
-        dz = -L_inv @ Lu - L_inv @ Z @ dl
+        dz = -L_inv @ Ll - L_inv @ Z @ dl
 
         ## 更新迭代
         idx_l = np.flatnonzero(dl < 0)
         idx_u = np.flatnonzero(du < 0)
-        alpha_p = 0.9995 * min([np.min(-l[idx_l] / dl[idx_l]), np.min(-u[idx_u] / du[idx_u]), 1])
+        alpha_p = 0.9995 * min([np.min(-l[idx_l] / dl[idx_l]) if len(idx_l) else 1, np.min(-u[idx_u] / du[idx_u]) if len(idx_u) else 1, 1])
         idx_z = np.flatnonzero(dz < 0)
-        idx_w = np.flatnonzero(dw < 0)
-        alpha_d = 0.9995 * min([np.min(-z[idx_z] / dz[idx_z]), np.min(-w[idx_w] / dw[idx_w]), 1])
+        idx_w = np.flatnonzero(dw > 0)
+        alpha_d = 0.9995 * min([np.min(-z[idx_z] / dz[idx_z]) if len(idx_z) else 1, np.min(-w[idx_w] / dw[idx_w]) if len(idx_w) else 1, 1])
         x = x + alpha_p * dx
         l = l + alpha_p * dl
         u = u + alpha_p * du
@@ -100,6 +99,10 @@ def ips(f_func: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]],
 
     if not converged:
         print('Not converged!')
+    else:
+        print('Converged in ' + str(i) + ' iterations!')
+        print(x)
+        print(f)
 
 if __name__ == "__main__":
     '''
@@ -114,7 +117,7 @@ if __name__ == "__main__":
          0 <= x3 <= M
     M -> inf
     '''
-    M = 5
+    M = 1
     def obj(x):
         f = np.sum(x*x) + 8
         df = 2 * x
@@ -139,7 +142,7 @@ if __name__ == "__main__":
         return g, dg
     
     def hess(x, s):
-        d2f = np.ones((3, 3)) * 2
+        d2f = np.eye(3) * 2
         y, z = s
         d2hy = np.zeros((3, 3))
         d2hy[1][1] = -2 * y[0]
@@ -150,7 +153,7 @@ if __name__ == "__main__":
         d2gz[2][2] = 2 * z[0] + 2 * z[1]
         return -d2f + d2hy + d2gz
 
-    x0 = np.ones(3)
-    gl = np.array([0, -M])
+    x0 = np.ones(3) * 0.5
+    gl = np.array([0, M])
     gu = np.array([M, 20])
     ips(obj, eqcons, neqcons, hess, x0, gl, gu)
