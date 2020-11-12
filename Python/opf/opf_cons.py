@@ -2,9 +2,7 @@ from typing import Dict
 import numpy as np
 
 
-GEN_BUS = 0
-PD = 2
-QD = 3
+from constant import GEN_BUS, PD, QD
 
 
 def opf_eqcons(x: np.ndarray, Ybus: np.ndarray, ppc: Dict):
@@ -23,13 +21,13 @@ def opf_eqcons(x: np.ndarray, Ybus: np.ndarray, ppc: Dict):
     V = vm * np.exp(1j * theta)
 
     # 等式约束
-    idx_g = gen[:, GEN_BUS] - 1     # 下标从0开始
+    idx_g = gen[:, GEN_BUS].astype(int) - 1     # 下标从0开始
     
     ## 等式约束误差
     h = np.zeros(2 * nb)
     h[idx_g * 2] = pg
     h[idx_g * 2 + 1] = qg
-    Sbus = V * np.conj(Ybus * V)
+    Sbus = V * np.conj(Ybus @ V)
     h[np.arange(nb) * 2] -= bus[:, PD] + Sbus.real
     h[np.arange(nb) * 2 + 1] -= bus[:, QD] + Sbus.imag
 
@@ -38,15 +36,16 @@ def opf_eqcons(x: np.ndarray, Ybus: np.ndarray, ppc: Dict):
     dh[np.arange(ng), idx_g * 2] = 1     ## dh/dpg
     dh[np.arange(ng, 2 * ng), idx_g * 2 + 1] = 1     ## dh/dqg
     dp_dva, dq_dva, dp_dvm, dq_dvm = dSbus_dV(Ybus, V)
-    dh[np.arange(2 * ng, 2 * (ng + nb), 2), np.arange(2 * ng, 2 * (ng + nb), 2)] = -dp_dva
-    dh[np.arange(2 * ng, 2 * (ng + nb), 2), np.arange(2 * ng + 1, 2 * (ng + nb), 2)] = -dq_dva
-    dh[np.arange(2 * ng + 1, 2 * (ng + nb), 2), np.arange(2 * ng, 2 * (ng + nb), 2)] = -dp_dvm
-    dh[np.arange(2 * ng + 1, 2 * (ng + nb), 2), np.arange(2 * ng + 1, 2 * (ng + nb), 2)] = -dq_dvm
+    dh[2 * ng : 2 * (ng + nb) : 2, :][:, 0 : 2 * nb : 2] = -dp_dva
+    dh[2 * ng : 2 * (ng + nb) : 2, :][:, 1 : 2 * nb : 2] = -dq_dva
+    dh[2 * ng + 1 : 2 * (ng + nb) : 2, :][:, 0 : 2 * nb : 2] = -dp_dvm
+    dh[2 * ng + 1 : 2 * (ng + nb) : 2, :][:, 1 : 2 * nb : 2] = -dq_dvm
     
     return h, dh
 
 
-
+def opf_ieqcons():
+    pass
 
 
 def dSbus_dV(Ybus: np.ndarray, V: np.ndarray):
@@ -58,3 +57,21 @@ def dSbus_dV(Ybus: np.ndarray, V: np.ndarray):
     dSbus_dVa = 1j * np.diag(V) @ np.conj(diagIbus - Ybus @ diagV)
     return dSbus_dVa.real, dSbus_dVa.imag, dSbus_dVm.real, dSbus_dVm.imag
 
+
+
+if __name__ == "__main__":
+    from makeYbus import makeYbus
+    from case5 import case5
+    from constant import PMAX, PMIN, QMAX, QMIN
+    ppc = case5()
+    Ybus, Yf, Yt = makeYbus(ppc['baseMVA'], ppc['bus'], ppc['branch'])
+    bus, gen, branch = ppc["bus"], ppc["gen"], ppc["branch"]
+    nb = bus.shape[0]
+    ng = gen.shape[0]
+    x = np.zeros(2 * (ng + nb))
+    x[0 : ng] = (gen[:, PMAX] + gen[:, PMIN]) / 2
+    x[ng : 2 * ng] = (gen[:, QMAX] + gen[:, QMIN]) / 2
+    x[2 * ng : 2 * (ng + nb) : 2] = 0
+    x[2 * ng + 1: 2 * (ng + nb) : 2] = 1
+    x[-1] = 1.05
+    h, dh = opf_eqcons(x, Ybus, ppc)

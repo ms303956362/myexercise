@@ -1,6 +1,6 @@
 from numpy import array
 
-def case():
+def case5():
     ppc = {"version": '2'}
 
     ##-----  Power Flow Data  -----##
@@ -51,4 +51,4 @@ def case():
 if __name__ == "__main__":
     from pypower.api import runopf, ppoption
     ppopt = ppoption(OPF_FLOW_LIM=1, OUT_GEN=True)
-    runopf(case(), ppopt)
+    runopf(case5(), ppopt)
