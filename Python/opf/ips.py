@@ -154,6 +154,6 @@ if __name__ == "__main__":
         return -d2f + d2hy + d2gz
 
     x0 = np.ones(3) * 0.5
-    gl = np.array([0, M])
+    gl = np.array([0, 0])
     gu = np.array([M, 20])
     ips(obj, eqcons, neqcons, hess, x0, gl, gu)
