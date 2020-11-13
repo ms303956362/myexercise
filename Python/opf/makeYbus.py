@@ -1,7 +1,7 @@
-from numpy import ones, conj, nonzero, any, exp, pi, r_
+from numpy import ones, conj, nonzero, exp, pi, r_
 from scipy.sparse import csr_matrix
 
-from constant import BUS_I, GS, BS
+from constant import GS, BS
 from constant import F_BUS, T_BUS, BR_R, BR_X, BR_B, BR_STATUS, SHIFT, TAP
 
 

@@ -1,7 +1,5 @@
-from typing import Dict
 import numpy as np
-
-
+from typing import Dict
 from constant import GEN_BUS, PD, QD
 
 
@@ -55,7 +53,7 @@ def dSbus_dV(Ybus: np.ndarray, V: np.ndarray):
     diagVnorm = np.diag(V / np.abs(V))
     dSbus_dVm = diagV @ np.conj(Ybus @ diagVnorm) + np.conj(diagIbus) @ diagVnorm
     dSbus_dVa = 1j * np.diag(V) @ np.conj(diagIbus - Ybus @ diagV)
-    return dSbus_dVa.real, dSbus_dVa.imag, dSbus_dVm.real, dSbus_dVm.imag
+    return dSbus_dVa.real.T, dSbus_dVa.imag.T, dSbus_dVm.real.T, dSbus_dVm.imag.T
 
 
 
