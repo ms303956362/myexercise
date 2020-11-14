@@ -6,7 +6,7 @@ def ips(f_func: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]],
         h_func: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]], 
         g_func: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]],
         hess_func: Callable[[np.ndarray, Tuple[np.ndarray, np.ndarray]], np.ndarray], 
-        x0: np.ndarray, gl: np.ndarray, gu: np.ndarray, max_it=50) -> Dict:
+        x0: np.ndarray, gl: np.ndarray, gu: np.ndarray, max_it=50, retList=False) -> Dict:
     """
         min f(x)
          x
@@ -36,11 +36,16 @@ def ips(f_func: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]],
 
     # Newton迭代
     x = x0
+    f = 0
     converged = False
+    gapList = []
+    iterList = []
     while i < max_it:
         i += 1
         # 计算对偶间隙
         gap = np.dot(l, z) - np.dot(u, w)
+        gapList.append(gap)
+        iterList.append(i)
         if gap < eps:
             converged = True
             break
@@ -101,8 +106,10 @@ def ips(f_func: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]],
         print('Not converged!')
     else:
         print('Converged in ' + str(i) + ' iterations!')
-    
-    return x, f
+    if retList:
+        return x, f, iterList, gapList
+    else:
+        return x, f
 
 if __name__ == "__main__":
     '''

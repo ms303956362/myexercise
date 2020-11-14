@@ -4,13 +4,15 @@ from opf_cost import *
 from opf_hess import *
 from makeYbus import *
 from ips import *
-from constant import PMIN, PMAX, QMIN, QMAX, VMIN, VMAX, RATE_A
+from constant import *
+from utils import *
+from copy import deepcopy
 
 
-def opf(ppc):
+def opf(ppc, printResult=True, plotGap=False):
     # 系统参数
     bus, gen, branch = ppc["bus"], ppc["gen"], ppc["branch"]
-    Ybus, Yf, _ = makeYbus(ppc['baseMVA'], ppc['bus'], ppc['branch'])
+    Ybus, Yf, Yt = makeYbus(ppc['baseMVA'], ppc['bus'], ppc['branch'])
     
     # 维数
     nb = bus.shape[0]
@@ -44,15 +46,45 @@ def opf(ppc):
     hess_func = lambda x, lmbda: opf_hess(x, lmbda, Ybus, Yf, ppc)
 
     # 内点法求解
-    x, f = ips(f_func, h_func, g_func, hess_func, x0, gl, gu)
+    x, f, iterList, gapList = ips(f_func, h_func, g_func, hess_func, x0, gl, gu, retList=True)
     theta_ref = x[-2]
     x[2 * ng : 2 * (ng + nb) : 2] -= theta_ref
-    return x, f
+
+    # 计算支路功率
+    pg = x[0 : ng]
+    qg = x[ng : 2 * ng]
+    theta = x[2 * ng : 2 * (ng + nb) : 2]
+    vm = x[2 * ng + 1 : 2 * (ng + nb) : 2]
+    V = vm * np.exp(1j * theta)
+    Sf = V[branch[:, F_BUS].astype(int) - 1] * np.conj(Yf @ V)
+    St = V[branch[:, T_BUS].astype(int) - 1] * np.conj(Yt @ V)
+    # 保存结果
+    result = deepcopy(ppc)
+    result['cost'] = f
+    result['gen'][:, PG] = pg
+    result['gen'][:, QG] = qg
+    result['bus'][:, VM] = vm
+    result['bus'][:, VA] = theta
+    result['branch'][:, ANGMIN] = Sf.real
+    result['branch'][:, ANGMAX] = St.real
+
+    # 打印结果
+    if printResult:
+        printResultDict(result)
+    if plotGap:
+        plotGapList(iterList, gapList)
+    
+    return result
 
 
 if __name__ == "__main__":
     from case5 import case5
     ppc = case5()
-    x, f = opf(ppc)
-    print(x)
-    print(f)
+    res = opf(ppc, plotGap=True)
+    print(res['cost'])
+    print(res['gen'][:, PG])
+    print(res['gen'][:, QG])
+    print(res['bus'][:, VM])
+    print(res['bus'][:, VA])
+    print(res['branch'][:, ANGMIN])
+    print(res['branch'][:, ANGMAX])

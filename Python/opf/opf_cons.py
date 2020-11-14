@@ -60,11 +60,11 @@ def opf_ieqcons(x: np.ndarray, Yf: np.ndarray, ppc: Dict):
 
     # 不等式约束
     Sf = V[branch[:, F_BUS].astype(int) - 1] * np.conj(Yf @ V)
-    g = np.zeros(2 * (ng + nb))
+    g = np.zeros(2 * ng + nb + nl)
     g[0 : ng] = pg
     g[ng : 2 * ng] = qg
     g[2 * ng : 2 * ng + nb] = vm
-    g[2 * ng + nb: 2 * (ng + nb)] = Sf.real
+    g[2 * ng + nb: 2 * ng + nb + nl] = Sf.real
 
     # 不等式约束雅可比矩阵
     dg = np.zeros((2 * (ng + nb), 2 * ng + nb + nl))

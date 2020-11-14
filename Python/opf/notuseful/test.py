@@ -1,4 +1,5 @@
-from pypower.api import pips
+from case5 import case5
+from pypower.api import pips, runopf, ppoption
 
 
 if __name__ == "__main__":
@@ -48,3 +49,8 @@ if __name__ == "__main__":
     solution = pips(f2, x0, gh_fcn=gh2, hess_fcn=hess2, xmin=xmin)
     print(solution['x'])
     print(solution['f'])
+
+    ppc = case5()
+    ppopt = ppoption(OUT_GEN=True)
+    runopf(ppc, ppopt)
+    
