@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Dict
 from constant import GEN_BUS, PD, QD, F_BUS
+from derivatives import dSbus_dV, dSbr_dV
 
 
 def opf_eqcons(x: np.ndarray, Ybus: np.ndarray, ppc: Dict):
@@ -75,40 +76,6 @@ def opf_ieqcons(x: np.ndarray, Yf: np.ndarray, ppc: Dict):
     dg[2 * ng + 1: 2 * (ng + nb) : 2, :][:, (2 * ng + nb) : (2 * ng + nb + nl)] = dp_dvm
 
     return g, dg
-
-
-def dSbus_dV(Ybus: np.ndarray, V: np.ndarray):
-    Ibus = Ybus @ V
-    diagV = np.diag(V)
-    diagIbus = np.diag(Ibus)
-    diagVnorm = np.diag(V / np.abs(V))
-    dSbus_dVm = diagV @ np.conj(Ybus @ diagVnorm) + np.conj(diagIbus) @ diagVnorm
-    dSbus_dVa = 1j * np.diag(V) @ np.conj(diagIbus - Ybus @ diagV)
-    return dSbus_dVa.real.T, dSbus_dVa.imag.T, dSbus_dVm.real.T, dSbus_dVm.imag.T
-
-
-def dSbr_dV(branch: Dict, Yf: np.ndarray, V: np.ndarray):
-    f = branch[:, F_BUS].astype(int) - 1
-    nl = len(f)
-    nb = len(V)
-
-    Vnorm = V / abs(V)
-
-    If = Yf @ V
-    diagVf      = np.diag(V[f])
-    diagIf      = np.diag(If)
-    diagV       = np.diag(V)
-    diagVnorm   = np.diag(Vnorm)
-    temp1       = np.zeros((nl, nb), complex)
-    temp2       = np.zeros((nl, nb), complex)
-    for i in range(nl):
-        temp1[i, f[i]] = np.asscalar(V[f[i]])
-        temp2[i, f[i]] = np.asscalar(Vnorm[f[i]])
-
-    dSf_dVa = 1j * (np.conj(diagIf) @ temp1 - diagVf @ np.conj(Yf @ diagV))
-    dSf_dVm = diagVf @ np.conj(Yf @ diagVnorm) + np.conj(diagIf) @ temp2
-    
-    return dSf_dVa.real.T, dSf_dVa.imag.T, dSf_dVm.real.T, dSf_dVm.imag.T
 
 
 if __name__ == "__main__":
