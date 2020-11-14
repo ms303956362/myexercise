@@ -46,9 +46,3 @@ def case5():
     ])
 
     return ppc
-
-
-if __name__ == "__main__":
-    from pypower.api import runopf, ppoption
-    ppopt = ppoption(OPF_FLOW_LIM=1, OUT_GEN=True)
-    runopf(case5(), ppopt)

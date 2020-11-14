@@ -101,8 +101,8 @@ def ips(f_func: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]],
         print('Not converged!')
     else:
         print('Converged in ' + str(i) + ' iterations!')
-        print(x)
-        print(f)
+    
+    return x, f
 
 if __name__ == "__main__":
     '''
