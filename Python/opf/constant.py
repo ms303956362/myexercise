@@ -50,3 +50,10 @@ SHIFT       = 9    # angle, transformer phase shift angle (degrees)
 BR_STATUS   = 10   # initial branch status, 1 - in service, 0 - out of service
 ANGMIN      = 11   # minimum angle difference, angle(Vf) - angle(Vt) (degrees)
 ANGMAX      = 12   # maximum angle difference, angle(Vf) - angle(Vt) (degrees)
+
+# gencost列号
+MODEL       = 0
+STARTUP     = 1
+SHUTDOWN    = 2
+NCOST       = 3
+COST        = 4

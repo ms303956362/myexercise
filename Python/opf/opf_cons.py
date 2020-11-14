@@ -68,8 +68,8 @@ def opf_ieqcons(x: np.ndarray, Yf: np.ndarray, ppc: Dict):
     # 不等式约束雅可比矩阵
     dg = np.zeros((2 * (ng + nb), 2 * ng + nb + nl))
     dg[0 : ng, :][:, 0 : ng] = np.eye(ng)       # dpg / dpg
-    dg[ng : 2 * ng, :][:, ng : 2 * ng] = np.eye(ng)     #dqg / dqg
-    dg[2 * ng + 1 : 2 * (ng + nb) : 2, 2 * ng : 2 * ng + nb] = 1    # dv / dv
+    dg[ng : 2 * ng, :][:, ng : 2 * ng] = np.eye(ng)     # dqg / dqg
+    dg[2 * ng + 1 : 2 * (ng + nb) : 2, 2 * ng : 2 * ng + nb] = np.eye(nb)    # dv / dv
     dp_dva, _, dp_dvm, _ = dSbr_dV(branch, Yf, V)
     dg[2 * ng : 2 * (ng + nb) : 2, :][:, (2 * ng + nb) : (2 * ng + nb + nl)] = dp_dva
     dg[2 * ng + 1: 2 * (ng + nb) : 2, :][:, (2 * ng + nb) : (2 * ng + nb + nl)] = dp_dvm
@@ -128,4 +128,3 @@ if __name__ == "__main__":
     x[-1] = 1.05
     h, dh = opf_eqcons(x, Ybus, ppc)
     g, dg = opf_ieqcons(x, Yf, ppc)
-    
