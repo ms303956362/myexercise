@@ -80,11 +80,4 @@ def opf(ppc, printResult=True, plotGap=False):
 if __name__ == "__main__":
     from case5 import case5
     ppc = case5()
-    res = opf(ppc, plotGap=True)
-    print(res['cost'])
-    print(res['gen'][:, PG])
-    print(res['gen'][:, QG])
-    print(res['bus'][:, VM])
-    print(res['bus'][:, VA])
-    print(res['branch'][:, ANGMIN])
-    print(res['branch'][:, ANGMAX])
+    res = opf(ppc)

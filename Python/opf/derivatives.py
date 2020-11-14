@@ -4,6 +4,19 @@ from constant import F_BUS
 
 
 def dSbus_dV(Ybus: np.ndarray, V: np.ndarray):
+    '''
+    节点注入复功率关于电压相量的导数
+    输入参数：
+        Ybus:   节点导纳矩阵
+        V:      电压相量
+    返回：
+        dSbus_dVa.real： 节点注入有功功率关于电压相角的导数
+        dSbus_dVa.imag： 节点注入无功功率关于电压相角的导数
+        dSbus_dVm.real： 节点注入有功功率关于电压幅值的导数
+        dSbus_dVm.imag： 节点注入无功功率关于电压幅值的导数
+    参考资料：
+        http://www.pserc.cornell.edu/matpower/TN2-OPF-Derivatives.pdf
+    '''
     Ibus = Ybus @ V
     diagV = np.diag(V)
     diagIbus = np.diag(Ibus)
@@ -14,6 +27,20 @@ def dSbus_dV(Ybus: np.ndarray, V: np.ndarray):
 
 
 def dSbr_dV(branch: Dict, Yf: np.ndarray, V: np.ndarray):
+    '''
+    支路复功率关于电压相量的导数
+    输入参数：
+        branch: 标准case中的branch矩阵
+        Yf:     支路导纳矩阵
+        V:      电压相量
+    返回：
+        dSf_dVa.real： 支路有功功率关于电压相角的导数
+        dSf_dVa.imag： 支路无功功率关于电压相角的导数
+        dSf_dVm.real： 支路有功功率关于电压幅值的导数
+        dSf_dVm.imag： 支路无功功率关于电压幅值的导数
+    参考资料：
+        http://www.pserc.cornell.edu/matpower/TN2-OPF-Derivatives.pdf
+    '''
     f = branch[:, F_BUS].astype(int) - 1
     nl = len(f)
     nb = len(V)
@@ -38,6 +65,20 @@ def dSbr_dV(branch: Dict, Yf: np.ndarray, V: np.ndarray):
 
 
 def d2Sbus_dV2(Ybus, V, lam):
+    '''
+    节点注入复功率关于电压相量的二阶导数
+    输入参数：
+        Ybus:   节点导纳矩阵
+        V:      电压相量
+        lam:    等式约束的拉格朗日乘子
+    返回：
+        Haa： 节点注入功率关于电压相角的二阶偏导数
+        Hav： 节点注入功率关于电压相角和电压幅值的混合偏导数
+        Hva： 节点注入功率关于电压幅值和电压相角的混合偏导数
+        Hvv： 节点注入功率关于电压幅值的二阶偏导数
+    参考资料：
+        http://www.pserc.cornell.edu/matpower/TN2-OPF-Derivatives.pdf
+    '''
     nb = len(V)
     Ibus = Ybus @ V
     diaglam = np.diag(lam)
@@ -60,6 +101,21 @@ def d2Sbus_dV2(Ybus, V, lam):
 
 
 def d2Sbr_dV2(Cbr, Ybr, V, lam):
+    '''
+    支路复功率关于电压相量的导数
+    输入参数：
+        Cbr:    线路与节点之间的关联矩阵
+        Ybr:    支路导纳矩阵
+        V:      电压相量
+        lam:    不等式约束的拉格朗日乘子
+    返回：
+        Gaa： 支路功率关于电压相角的二阶偏导数
+        Gav： 支路功率关于电压相角和电压幅值的混合偏导数
+        Gva： 支路功率关于电压幅值和电压相角的混合偏导数
+        Gvv： 支路功率关于电压幅值的二阶偏导数
+    参考资料：
+        http://www.pserc.cornell.edu/matpower/TN2-OPF-Derivatives.pdf
+    '''
     nb = len(V)
 
     diaglam = np.diag(lam)

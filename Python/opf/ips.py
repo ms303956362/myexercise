@@ -8,11 +8,25 @@ def ips(f_func: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]],
         hess_func: Callable[[np.ndarray, Tuple[np.ndarray, np.ndarray]], np.ndarray], 
         x0: np.ndarray, gl: np.ndarray, gu: np.ndarray, max_it=50, retList=False) -> Dict:
     """
+    内点法求解器
         min f(x)
          x
     s.t.
         h(x) = 0
         gl <= g(x) <= gu
+    参数：
+        f_func:     计算目标函数及目标函数梯度的函数
+        h_func:     计算等式约束及等式约束雅可比矩阵的函数
+        g_func:     计算不等式约束及不等式约束雅克比矩阵的函数
+        hess_func:  计算目标函数、等式约束、不等式约束分别乘以各自乘子后的Hess矩阵，并线性组合
+        x0:         状态变量初值
+        gl:         不等式约束下限
+        gu:         不等式约束上限
+        max_it:     最大迭代次数
+        retList:    是否返回gap曲线
+    返回：
+        x:          收敛时的状态变量
+        f:          收敛时的目标函数
     """
     # 参数初始化
     i = 0
@@ -110,6 +124,7 @@ def ips(f_func: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]],
         return x, f, iterList, gapList
     else:
         return x, f
+
 
 if __name__ == "__main__":
     '''

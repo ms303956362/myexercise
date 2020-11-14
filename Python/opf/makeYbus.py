@@ -8,6 +8,13 @@ from constant import F_BUS, T_BUS, BR_R, BR_X, BR_B, BR_STATUS, SHIFT, TAP
 def makeYbus(baseMVA, bus, branch):
     """
     节点导纳矩阵Ybus和支路导纳矩阵Yf和Yt
+    输入参数：
+        baseMVA:    基准容量
+        bus:        标准case的bus矩阵
+        branch:     标准case的branch矩阵
+    返回：
+        Ybus:       节点导纳矩阵
+        Yf, Yt:     支路导纳矩阵
     """
     # 维数
     nb = bus.shape[0]     

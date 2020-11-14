@@ -3,6 +3,15 @@ import numpy as np
 
 
 def opf_cost(x, ppc):
+    '''
+    目标函数及其梯度
+    输入参数：
+        x:      状态变量 {Pg, Qg, theta, Vm}
+        ppc：   标准case
+    返回：
+        f:      目标函数在状态变量为x时的值
+        df：    目标函数在状态变量x时梯度的值
+    '''
     baseMVA, gen, gencost = ppc['baseMVA'], ppc['gen'], ppc['gencost']
     # 维数
     nx = x.shape[0]

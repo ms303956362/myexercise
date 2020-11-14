@@ -5,6 +5,16 @@ from derivatives import dSbus_dV, dSbr_dV
 
 
 def opf_eqcons(x: np.ndarray, Ybus: np.ndarray, ppc: Dict):
+    '''
+    等式约束及其雅可比矩阵
+    输入参数：
+        x:      状态变量 {Pg, Qg, theta, Vm}
+        Ybus:   节点导纳矩阵
+        ppc：   标准case
+    返回：
+        h:      等式约束在状态变量为x时的值
+        dh：    等式约束雅克比矩阵在状态变量x时的值
+    '''
     bus, gen, branch = ppc["bus"], ppc["gen"], ppc["branch"]
     # 维数
     nx = x.shape[0]
@@ -44,6 +54,16 @@ def opf_eqcons(x: np.ndarray, Ybus: np.ndarray, ppc: Dict):
 
 
 def opf_ieqcons(x: np.ndarray, Yf: np.ndarray, ppc: Dict):
+    '''
+    不等式约束及其雅可比矩阵
+    输入参数：
+        x:      状态变量 {Pg, Qg, theta, Vm}
+        Yf:     支路导纳矩阵
+        ppc：   标准case
+    返回：
+        g:      不等式约束在状态变量为x时的值
+        dg：    不等式约束雅克比矩阵在状态变量x时的值
+    '''
     bus, gen, branch = ppc["bus"], ppc["gen"], ppc["branch"]
     # 维数
     nx = x.shape[0]

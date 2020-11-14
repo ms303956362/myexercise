@@ -4,6 +4,15 @@ from derivatives import d2Sbus_dV2, d2Sbr_dV2
 
 
 def opf_hess(x, lmbda, Ybus, Yf, ppc):
+    '''
+    目标函数、等式约束点乘拉格朗日乘子、不等式约束点乘拉格朗日乘子的Hess矩阵
+    输入参数：
+        x:      状态变量 {Pg, Qg, theta, Vm}
+        lmbda:  等式约束和不等式约束的拉格朗日乘子
+        Ybus:   节点导纳矩阵
+        Yf:     支路导纳矩阵
+        ppc：   标准case
+    '''
     baseMVA, bus, gen, branch, gencost = ppc['baseMVA'], ppc['bus'], ppc['gen'], ppc['branch'], ppc['gencost']
     
     # 维数
