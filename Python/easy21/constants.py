@@ -1,0 +1,13 @@
+# action
+STICK = 0
+HIT = 1
+
+# card color
+RED = 0
+BLACK = 1
+
+# range
+DEALER_MAX_SHOW_SCORE = 10
+DEALER_STICK_SCORE = 17
+BUST_MIN_SCORE = 1
+BUST_MAX_SCORE = 21
