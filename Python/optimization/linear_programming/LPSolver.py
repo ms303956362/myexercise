@@ -1,3 +1,4 @@
+from constant import FINITE, INFEASIBLE
 import numpy as np
 
 
@@ -12,8 +13,6 @@ class LPSolver:
         self.A: np.ndarray = None
         self.b: np.ndarray = None
         self.c: np.ndarray = None
-        self.m = None
-        self.n = None
 
     def build(self, A: np.ndarray, b: np.ndarray, c: np.ndarray):
         # check the dimension of matrix A and vector b and c
@@ -24,9 +23,70 @@ class LPSolver:
         self.A = A
         self.b = b
         self.c = c
-        self.m = m
-        self.n = n
     
-    def solve(self):
-        assert self.A is not None and self.b is not None and self.c is not None and self.m == None and self.n == None   # whether initialized
+    def solve(self, max_iter=100, verbose=1):
+        # whether the matrices and vectors are initialized correctly
+        assert isinstance(self.A, np.ndarray) and isinstance(self.b, np.ndarray) and isinstance(self.c, np.ndarray)
+        assert len(self.A.shape) == 2 and len(self.b.shape) == 1 and len(self.c.shape) == 1
+        m, n = self.A.shape
+        assert m <= n and self.b.shape[0] == m and self.c.shape[0] == n
+        # Phase I
+        if verbose >= 1:
+            print('Phase I starts')
+        # change the problem so that b >= 0
+        i_neg_b, = np.where(self.b < 0)
+        self.A[i_neg_b, :] *= -1
+        self.b[i_neg_b] *= -1
+        # solve the auxiliary problem
+        A_aux = np.column_stack((self.A, np.eye(m)))
+        c_aux = np.concatenate((np.zeros(n), np.ones(m)))
+        x_aux = np.concatenate((np.zeros(n), self.b))
+        lB_aux = [i + n for i in range(m)]
+        res_aux = self.simplex(A_aux, self.b, c_aux, x_aux, lB_aux, max_iter, verbose)
+        assert res_aux['status'] == FINITE
+        # check optimal cost
+        if res_aux['cost'] > 0:
+            if verbose >= 1:
+                print('The problem is infeasible')
+            return {'status': INFEASIBLE}
+        assert res_aux['cost'] == 0
+        # check whether there are artficial variables in the basis
+        lB = res_aux['basic_indices']
+        B_inv = np.linalg.inv(A_aux[:, lB])
+        A = self.A
+        b = self.b
+        # there exists basic artificial variable
+        if max(lB) >= n:
+            l_arti, = np.where(np.array(lB) >= n)
+            for l in l_arti:
+                A_l = B_inv[l, :] @ self.A
+                # there exists redundant constraint
+                if (A_l == 0).all():
+                    i_nr = [i for i in range(m) if i != l]
+                    A = A[i_nr, :]
+                    b = b[i_nr]
+                    B_inv = B_inv[i_nr, :][:, i_nr]
+                    lB.pop(l)
+                    m -= 1
+                else:
+                    # change the basis
+                    j = np.where(A_l != 0)[0][0]
+                    lB[lB.index(lB[l])] = j
+                    # caculate the inverse of the new basis matrix
+                    u = B_inv @ A[:, j]
+                    Q = np.eye(m)
+                    Q[:, l] = -u / u[l]
+                    Q[l][l] = 1 / u[l]
+                    B_inv = Q @ B_inv
+        # Phase II
+        if verbose >= 1:
+            print('==============================================')
+            print('Phase II starts')
+        x = np.zeros(n)
+        x[lB] = B_inv @ b
+        return self.simplex(A, b, self.c, x, lB, max_iter, verbose)
+
+
+    @staticmethod
+    def simplex(A: np.ndarray, b: np.ndarray, c: np.ndarray, x: np.ndarray, lB: list, max_iter = 100, verbose=1) -> dict:
         raise NotImplementedError

@@ -1,3 +1,4 @@
+from constant import ERROR, FINITE, UNBOUNDED
 from LPSolver import LPSolver
 import numpy as np
 
@@ -5,11 +6,8 @@ class RevisedSimplexSolver(LPSolver):
     def __init__(self) -> None:
         super().__init__()
     
-    def solve(self):
-        pass
-    
     @staticmethod
-    def revised_simplex(A: np.ndarray, b: np.ndarray, c: np.ndarray, x: np.ndarray, lB: list, max_iter = 100, verbose=1):
+    def simplex(A: np.ndarray, b: np.ndarray, c: np.ndarray, x: np.ndarray, lB: list, max_iter = 100, verbose=1) -> dict:
         '''
         @parameters: 
         lB: indices of basic variables
@@ -31,24 +29,26 @@ class RevisedSimplexSolver(LPSolver):
             c_N = c[lN]
             cost = c_B.T @ x[lB]
             if verbose >= 1:
-                print('Cost: {}, Basis: {}, X: {}'.format(cost, lB, x))
+                print('Cost: {}, Basis: {}, x: {}'.format(cost, lB, x))
             # reduced costs of nonbasic variables
             N = A[:, lN]
             c_r = c_N.T - c_B.T @ B_inv @ N
             # all reduced costs of nonbasic variables are nonnegative
             if (c_r >= 0).all():
-                
                 if verbose >= 1:
                     print('Optimal cost is finite. Find optimal cost {} after {} iterations'.format(cost, iter + 1))
-                return {'status': 0, 'basic_indices': lB, 'extreme_point': x, 'cost': cost}
+                return {'status': FINITE, 'basic_indices': lB, 'extreme_point': x, 'cost': cost}
             # find the minimum index of the variable with negative reduced cost
             j = lN[np.where(c_r < 0)[0][0]]
             u = B_inv @ A[:, j]
             # all components of u are nonpositive
             if (u <= 0).all():
                 if verbose >= 1:
-                    print('Optimal cost is infinite. Find it after {} iterations'.format(iter))
-                return {'status': 1, 'basic_indices': lB, 'extreme_ray': -u, 'cost': -np.inf}
+                    print('Optimal cost is infinite. Find it after {} iterations'.format(iter + 1))
+                d = np.zeros(n)
+                d[lB] = -u
+                d[j] = 1
+                return {'status': UNBOUNDED, 'basic_indices': lB, 'extreme_ray': d, 'cost': -np.inf}
             # find the smallest x_b(i) / u_i with u_i > 0
             i_pos, = np.where(u > 0)
             theta = x[np.array(lB)[i_pos]] / u[i_pos]
@@ -67,9 +67,10 @@ class RevisedSimplexSolver(LPSolver):
             Q[:, l] = -u / u[l]
             Q[l][l] = 1 / u[l]
             B_inv = Q @ B_inv
-        return {'status': -1}
+        return {'status': ERROR}
 
 if __name__ == '__main__':
+    # test 0
     # A = np.array([
     #     [1, 2, 2, 1, 0, 0],
     #     [2, 1, 2, 0, 1, 0],
@@ -78,13 +79,39 @@ if __name__ == '__main__':
     # b = np.array([20, 20, 20], dtype=float)
     # c = np.array([-10, -12, -12, 0, 0, 0], dtype=float)
     # x = np.array([0, 0, 0, 20, 20, 20], dtype=float)
+    # lB = [3, 4, 5]
+
+    # test1
+    # A = np.array([
+    #     [1, 2, 3, 0],
+    #     [-1, 2, 6, 0],
+    #     [0, 4, 9, 0],
+    #     [0, 0, 3, 1]
+    # ], dtype=float)
+    # b = np.array([3, 2, 5, 1], dtype=float)
+    # c = np.array([1, 1, 1, 0], dtype=float)
+    # x = np.array([1, 1/2, 1/3, 0], dtype=float)
+    # lB = [0, 1, 2, 3]
+
+    # test2
+    # A = np.array([
+    #     [1, -1, 0],
+    #     [0, 1, -1]
+    # ], dtype=float)
+    # b = np.array([1, 3], dtype=float)
+    # c = np.array([-1, -1, -1], dtype=float)
+    # x = np.array([2, 1, 0], dtype=float)
+    # lB = [0, 1]
+
+    # test3
     A = np.array([
-        [1, 2, 3, 0],
-        [0, 4, 9, 0],
-        [0, 0, 3, 1]
-    ], dtype=float)
-    b = np.array([3, 5, 1], dtype=float)
-    c = np.array([1, 1, 1, 0], dtype=float)
-    x = np.array([1, 1/2, 1/3, 0], dtype=float)
-    lB = [0, 1, 2]
-    d = RevisedSimplexSolver.revised_simplex(A, b, c, x, lB)
+        [1, 3, 0, 4, 1],
+        [1, 2, 0, -3, 1],
+        [-1, -4, 3, 0, 0]
+    ])
+    b = np.array([2, 2, 1])
+    c = np.array([2, 3, 3, 1, -2])
+
+    solver = RevisedSimplexSolver()
+    solver.build(A, b, c)
+    d = solver.solve()
