@@ -1,20 +1,16 @@
 from constant import FINITE, INFEASIBLE
+from revised_simplex import revised_simplex
 import numpy as np
 
 
 class LPSolver:
-    def __init__(self) -> None:
+    def __init__(self, A: np.ndarray, b: np.ndarray, c: np.ndarray) -> None:
         '''
         Solve the linear programming in the standard form
         min  c^T x
         s.t. Ax = b
              x >= 0
         '''
-        self.A: np.ndarray = None
-        self.b: np.ndarray = None
-        self.c: np.ndarray = None
-
-    def build(self, A: np.ndarray, b: np.ndarray, c: np.ndarray):
         # check the dimension of matrix A and vector b and c
         assert len(A.shape) == 2 and len(b.shape) == 1 and len(c.shape) == 1    # whether A is matrix, b and c are vector
         # TODO check whether the rows of A are linearly independent. If not, eliminate the redundant row
@@ -23,7 +19,7 @@ class LPSolver:
         self.A = A
         self.b = b
         self.c = c
-    
+
     def solve(self, max_iter=100, verbose=1):
         # whether the matrices and vectors are initialized correctly
         assert isinstance(self.A, np.ndarray) and isinstance(self.b, np.ndarray) and isinstance(self.c, np.ndarray)
@@ -42,7 +38,7 @@ class LPSolver:
         c_aux = np.concatenate((np.zeros(n), np.ones(m)))
         x_aux = np.concatenate((np.zeros(n), self.b))
         lB_aux = [i + n for i in range(m)]
-        res_aux = self.simplex(A_aux, self.b, c_aux, x_aux, lB_aux, max_iter, verbose)
+        res_aux = revised_simplex(A_aux, self.b, c_aux, x_aux, lB_aux, max_iter, verbose)
         assert res_aux['status'] == FINITE
         # check optimal cost
         if res_aux['cost'] > 0:
@@ -84,9 +80,28 @@ class LPSolver:
             print('Phase II starts')
         x = np.zeros(n)
         x[lB] = B_inv @ b
-        return self.simplex(A, b, self.c, x, lB, max_iter, verbose)
+        return revised_simplex(A, b, self.c, x, lB, max_iter, verbose)
 
 
-    @staticmethod
-    def simplex(A: np.ndarray, b: np.ndarray, c: np.ndarray, x: np.ndarray, lB: list, max_iter = 100, verbose=1) -> dict:
-        raise NotImplementedError
+if __name__ == '__main__':
+    # test0
+    A = np.array([
+        [1, 2, 3, 0],
+        [-1, 2, 6, 0],
+        [0, 4, 9, 0],
+        [0, 0, 3, 1]
+    ], dtype=float)
+    b = np.array([3, 2, 5, 1], dtype=float)
+    c = np.array([1, 1, 1, 0], dtype=float)
+    
+    # test1
+    # A = np.array([
+    #     [1, 3, 0, 4, 1],
+    #     [1, 2, 0, -3, 1],
+    #     [-1, -4, 3, 0, 0]
+    # ], dtype=float)
+    # b = np.array([2, 2, 1], dtype=float)
+    # c = np.array([2, 3, 3, 1, -2], dtype=float)
+
+    solver = LPSolver(A, b, c)
+    solver.solve()
