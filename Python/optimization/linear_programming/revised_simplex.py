@@ -8,8 +8,6 @@ def revised_simplex(A: np.ndarray, b: np.ndarray, c: np.ndarray, x: np.ndarray, 
     max_iter: maximum number of iterations
     verbose: how much info will be printed
     @return: 
-    flag: 1: finite, 2: infinite
-    lB: 
     '''
     m, n = A.shape
     assert len(lB) == m
@@ -32,7 +30,7 @@ def revised_simplex(A: np.ndarray, b: np.ndarray, c: np.ndarray, x: np.ndarray, 
         if (c_r >= 0).all():
             if verbose >= 1:
                 print('Optimal cost is finite. Find optimal cost {} after {} iterations'.format(cost, iter + 1))
-            return {'status': FINITE, 'basic_indices': lB, 'extreme_point': x, 'cost': cost}
+            return {'status': FINITE, 'basic_indices': lB, 'extreme_point': x, 'cost': cost, 'dual_vector': (c[lB].T @ B_inv).T}
         # find the minimum index of the variable with negative reduced cost
         j = lN[np.where(c_r < 0)[0][0]]
         u = B_inv @ A[:, j]

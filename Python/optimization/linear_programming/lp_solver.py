@@ -1,9 +1,10 @@
+from numpy.testing._private.utils import assert_equal
 from constant import FINITE, INFEASIBLE
 from revised_simplex import revised_simplex
 import numpy as np
 
 
-class LPSolver:
+class StandardFormLPSolver:
     def __init__(self, A: np.ndarray, b: np.ndarray, c: np.ndarray) -> None:
         '''
         Solve the linear programming in the standard form
@@ -83,6 +84,51 @@ class LPSolver:
         return revised_simplex(A, b, self.c, x, lB, max_iter, verbose)
 
 
+class LPSolver(StandardFormLPSolver):
+    def __init__(self, Aeq: np.ndarray, Ageq: np.ndarray, Aleq: np.ndarray, 
+                beq: np.ndarray, bgeq: np.ndarray, bleq: np.ndarray, 
+                c: np.ndarray, xl: np.ndarray, xu: np.ndarray) -> None:
+        # check dimension of matrices
+        assert len(Aeq.shape) == 2 and len(Ageq.shape) == 2 and len(Aleq.shape) == 2
+        assert len(beq.shape) == 1 and len(bgeq.shape) == 1 and len(bleq.shape) == 1
+        assert len(xl.shape) == 1 and len(xu.shape) == 1 and len(c.shape) == 1
+        n, meq, mgeq, mleq, = Aeq.shape[1], len(beq), len(bgeq), len(bleq)
+        assert Aeq.shape[0] == meq and Ageq.shape[0] == mgeq and Aleq.shape[0] == mleq
+        assert Ageq.shape[1] == n and Aleq.shape[1] == n and len(xl) == n and len(xu) == n and len(c) == n
+        
+        # standardize
+        self.A = np.r_[
+            np.c_[Aeq,  -Aeq,  np.zeros((meq, mgeq)),  np.zeros((meq, mleq)) ],
+            np.c_[Ageq, -Ageq, -np.eye(mgeq),          np.zeros((mgeq, mleq))],
+            np.c_[Aleq, -Aleq, np.zeros((mleq, mgeq)), np.eye(mgeq)          ]
+        ]
+        self.b = np.r_[
+            beq.reshape((-1, 1)),
+            bgeq.reshape((-1, 1)),
+            bleq.reshape((-1, 1))
+        ]
+        lb_indices, = np.where(np.isfinite(xl))
+        nlb = len(lb_indices)
+        if len(lb_indices) > 0:
+            Il = np.zeros((nlb, n))
+            Il[lb_indices, np.arange(n)] = 1
+            self.A = np.c_[self.A, np.zeros((meq + mgeq + mleq, nlb))]
+            self.A = np.r_[self.A, 
+                           np.c_[Il, -Il, np.zeros((nlb, mgeq)), np.zeros((nlb, mleq)), -np.eye(nlb)]]
+
+            self.b = np.r_[self.b, xl[lb_indices].reshape((-1, 1))]
+
+        ub_indices, = np.where(np.isfinite(xu))
+        nub = len(ub_indices)
+        if len(ub_indices) > 0:
+            Iu = np.zeros((nub, n))
+            Iu[ub_indices, np.arange(n)] = 1
+            self.A = np.c_[self.A, np.zeros((meq + mgeq + mleq + nlb, nub))]
+            self.A = np.r_[self.A, 
+                           np.c_[Iu, -Iu, np.zeros((nub, mgeq)), np.zeros((nub, mleq)), np.zeros((nub, nlb)), -np.eye(nub)]]
+
+            self.b = np.r_[self.b, xu[ub_indices].reshape((-1, 1))]
+
 if __name__ == '__main__':
     # test0
     A = np.array([
@@ -103,5 +149,5 @@ if __name__ == '__main__':
     # b = np.array([2, 2, 1], dtype=float)
     # c = np.array([2, 3, 3, 1, -2], dtype=float)
 
-    solver = LPSolver(A, b, c)
+    solver = StandardFormLPSolver(A, b, c)
     solver.solve()
