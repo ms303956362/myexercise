@@ -40,10 +40,8 @@ if __name__ == '__main__':
             row['Fuel_Cost_c']
         ] for _, row in gen_dataframe.iterrows()
     })
-    # b_ = gp.tupledict({g: 2 * b[g] * np.random.rand() for g in G})
-    # a_ = gp.tupledict({g: 2 * a[g] * np.random.rand() for g in G})
-    b_ = gp.tupledict({g: 1.2 * b[g] for g in G})
-    a_ = gp.tupledict({g: 0.8 * a[g] for g in G})
+    b_ = gp.tupledict({g: b[g] * 1.2 for g in G})
+    a_ = gp.tupledict({g: a[g] * 0.8 for g in G})
 
     # branch data
     A, BF, BT, F_max, B = gp.multidict({
@@ -55,11 +53,6 @@ if __name__ == '__main__':
         ]
         for _, row in branch_dataframe.iterrows()
     })  # NL
-    alpha = gp.tupledict({
-        (i, j, t): 1
-        for i, j in A for t in T
-    })
-    alpha['B4', 'B7', 11] = 0
 
     # bus data
     N = set()
@@ -102,9 +95,9 @@ if __name__ == '__main__':
     beta = m.addVars(N, T, name='beta')
 
     obj = gp.quicksum((SU[g] * v[g, t] + SD[g] * w[g, t] +
-               b[g] * p[g, t] + a[g] * u[g, t] +
-               b_[g] * s[g, t] + a_[g] * u[g, t]
-               for g in G for t in T)) + VOLL * delta.sum('*', '*')
+                       b[g] * p[g, t] + a[g] * u[g, t] +
+                       b_[g] * s[g, t] + a_[g] * u[g, t]
+                       for g in G for t in T)) + VOLL * delta.sum('*', '*')
     m.setObjective(obj)
 
     m.addConstrs((u[g, t] - u[g, t - 1] <= u[g, tau]
@@ -122,9 +115,8 @@ if __name__ == '__main__':
     m.addConstrs((s.sum(GN[i], t) >= RS[i] for i in N for t in T), name='reserve_bus')
     m.addConstrs((f.sum(i, '*', t) - f.sum('*', i, t) - p.sum(GN[i], t) - s.sum(GN[i], t) - delta[i, t]
                   == W[i, t] - D[i, t] for i in N for t in T), name='balance')
-    m.addConstrs((f[i, j, t] - B[i, j] * (beta[i, t] - beta[j, t]) == 0 for i, j in A for t in T), 'flow')
-    m.addConstrs((-F_max[i, j] * alpha[i, j, t] <= f[i, j, t] for i, j in A for t in T), name='branch_up')
-    m.addConstrs((f[i, j, t] <= F_max[i, j] * alpha[i, j, t] for i, j in A for t in T), name='branch_down')
+    m.addConstrs((f[i, j, t] - B[i, j] * (beta[i, t] - beta[j, t]) == 0 for i, j in A for t in T))
+
     m.optimize()
 
     u_val = m.getAttr('x', u)
