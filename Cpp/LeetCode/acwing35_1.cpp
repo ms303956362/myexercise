@@ -47,3 +47,29 @@ struct ListNode {
     ListNode(int x) : val(x), next(nullptr) {}
     ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
+
+
+
+int main(int argc, char const *argv[])
+{
+    string a, b;
+    cin >> a >> b;
+    for (auto& c : a) {
+        if ('A' <= c && c <= 'Z') {
+            c = c - 'A' + 'a';
+        }
+    }
+    for (auto& c : b) {
+        if ('A' <= c && c <= 'Z') {
+            c = c - 'A' + 'a';
+        }
+    }
+    if (a > b) {
+        cout << 1 << endl;
+    } else if (a == b) {
+        cout << 0 << endl;
+    } else {
+        cout << -1 << endl;
+    }
+    return 0;
+}
