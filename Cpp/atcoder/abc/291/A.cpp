@@ -1,5 +1,6 @@
 // IO
 #include <iostream>
+#include <iomanip>      // std::setprecision
 #include <sstream>
 // ordered container
 #include <vector>
@@ -29,23 +30,22 @@
 // functional
 #include <functional>
 
-#include <numeric>
-
 using namespace std;
 
-struct TreeNode {
-    int val;
-    TreeNode *left;
-    TreeNode *right;
-    TreeNode() : val(0), left(nullptr), right(nullptr) {}
-    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
-    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
-};
+using ll = long long;
 
-struct ListNode {
-    int val;
-    ListNode *next;
-    ListNode() : val(0), next(nullptr) {}
-    ListNode(int x) : val(x), next(nullptr) {}
-    ListNode(int x, ListNode *next) : val(x), next(next) {}
-};
+int main(int argc, char const *argv[])
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    string s;
+    cin >> s;
+    int n = s.size();
+    for (int i = 0; i < n; ++i) {
+        if ('A' <= s[i] && s[i] <= 'Z') {
+            cout << i + 1 << '\n';
+            return 0;
+        }
+    }
+    return 0;
+}
