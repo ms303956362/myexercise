@@ -1,8 +1,4 @@
-**/*.h5
-**/*.csv
-*.vscode
-*.mjpeg
-__pycache__
-*.pyc
-.ipynb_checkpoints
-.idea
+.DS_Store
+out
+in.txt
+out.txt

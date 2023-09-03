@@ -23,6 +23,7 @@
 #include <iterator>
 #include <memory>
 #include <utility>
+#include <numeric>
 // c
 #include <cstdio>
 #include <cstdlib>
